@@ -138,6 +138,12 @@ if err != nil {
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+Docker image:
+
+```bash
+docker pull ghcr.io/baukunstpatrimonio/user-go:dev-latest
+```
+
 ## Health Checking
 
 The service includes a gRPC health checking mechanism that allows clients to monitor the server's health status.

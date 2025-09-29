@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	pb "github.com/alvarotor/user-go/server/user-pb"
+	pb "github.com/baukunstpatrimonio/user-go/server/user-pb"
 )
 
 func (s *UserServer) GetIDByEmail(ctx context.Context, req *pb.UserMailRequest) (*pb.UserIDResponse, error) {

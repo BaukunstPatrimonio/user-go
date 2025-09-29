@@ -7,8 +7,8 @@ import (
 	"time"
 
 	entModels "github.com/alvarotor/entitier-go/models"
-	"github.com/alvarotor/user-go/server/dto"
-	"github.com/alvarotor/user-go/server/models"
+	"github.com/baukunstpatrimonio/user-go/server/dto"
+	"github.com/baukunstpatrimonio/user-go/server/models"
 	"golang.org/x/exp/rand"
 )
 

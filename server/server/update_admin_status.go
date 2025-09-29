@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	pb "github.com/alvarotor/user-go/server/user-pb"
+	pb "github.com/baukunstpatrimonio/user-go/server/user-pb"
 )
 
 func (s *UserServer) UpdateUserAdminStatus(ctx context.Context, req *pb.UpdateUserAdminRequest) (*pb.UserStatusResponse, error) {

@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/alvarotor/user-go/server/models"
+	"github.com/baukunstpatrimonio/user-go/server/models"
 	"github.com/golang-jwt/jwt/v5"
 )
 

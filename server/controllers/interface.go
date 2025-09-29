@@ -3,9 +3,9 @@ package controllers
 import (
 	"context"
 
-	"github.com/alvarotor/user-go/server/dto"
-	"github.com/alvarotor/user-go/server/models"
-	"github.com/alvarotor/user-go/server/services"
+	"github.com/baukunstpatrimonio/user-go/server/dto"
+	"github.com/baukunstpatrimonio/user-go/server/models"
+	"github.com/baukunstpatrimonio/user-go/server/services"
 )
 
 type IControllerUser interface {

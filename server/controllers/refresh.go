@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/baukunstpatrimonio/user-go/server/dto"
 	"github.com/baukunstpatrimonio/user-go/server/models"
@@ -81,7 +80,7 @@ func (u *controllerUser) Refresh(ctx context.Context, refreshToken string, req *
 	// Generate new access token and refresh token directly
 	expirationTime := getExpirationTime(uint(u.conf.TokenExpirationTime))
 
-	claims := &dto.ClaimsResponse{
+	accessClaims := &dto.ClaimsResponse{
 		Email:      user.Email,
 		Admin:      user.Admin,
 		SuperAdmin: user.SuperAdmin,
@@ -91,7 +90,7 @@ func (u *controllerUser) Refresh(ctx context.Context, refreshToken string, req *
 		},
 		DeviceInfo: createDeviceInfo(user),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
 	tokenString, err := token.SignedString(u.conf.JWTKey)
 	if err != nil {
 		u.log.Error(err.Error())

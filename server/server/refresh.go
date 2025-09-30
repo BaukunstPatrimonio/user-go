@@ -8,7 +8,7 @@ import (
 )
 
 func (s *UserServer) Refresh(ctx context.Context, req *pb.UserTokenRequest) (*pb.UserTokenResponse, error) {
-	status, token, err := s.UserController.Refresh(ctx, req.GetToken())
+	status, token, err := s.UserController.Refresh(ctx, req.GetToken(), req)
 	if err != nil {
 		s.Log.Error(err.Error())
 		return &pb.UserTokenResponse{}, err

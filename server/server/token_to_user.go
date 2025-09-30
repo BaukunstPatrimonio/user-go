@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	pb "github.com/alvarotor/user-go/server/user-pb"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

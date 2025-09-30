@@ -9,12 +9,12 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/alvarotor/user-go/server/controllers"
-	"github.com/alvarotor/user-go/server/db"
-	"github.com/alvarotor/user-go/server/models"
-	"github.com/alvarotor/user-go/server/server"
-	"github.com/alvarotor/user-go/server/services"
-	pb "github.com/alvarotor/user-go/server/user-pb"
+	"github.com/BaukunstPatrimonio/user-go/server/controllers"
+	"github.com/BaukunstPatrimonio/user-go/server/db"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/server"
+	"github.com/BaukunstPatrimonio/user-go/server/services"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc/health"
 	healthgrpc "google.golang.org/grpc/health/grpc_health_v1"

@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/alvarotor/entitier-go/repository"
-	"github.com/alvarotor/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 	"gorm.io/gorm"
 )
 

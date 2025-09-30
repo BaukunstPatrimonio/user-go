@@ -100,7 +100,7 @@ func (u *controllerUser) Refresh(ctx context.Context, refreshToken string, req *
 
 	expirationTimeRefresh := getExpirationTime(uint(u.conf.TokenExpirationTimeRefresh))
 
-	claimsRefresh := &dto.ClaimsRefreshResponse{
+	refreshClaims := &dto.ClaimsRefreshResponse{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTimeRefresh),
 			Issuer:    u.conf.Issuer,
@@ -108,7 +108,7 @@ func (u *controllerUser) Refresh(ctx context.Context, refreshToken string, req *
 		CodeRefresh: user.CodeRefresh,
 		DeviceInfo: createDeviceInfo(user),
 	}
-	tokenRefresh := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsRefresh)
+	tokenRefresh := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
 	tokenRefreshString, err := tokenRefresh.SignedString(u.conf.JWTKey)
 	if err != nil {
 		u.log.Error(err.Error())
@@ -124,24 +124,4 @@ func (u *controllerUser) Refresh(ctx context.Context, refreshToken string, req *
 	}
 
 	return http.StatusOK, modelToken, nil
-}
-
-func getExpirationTime(seconds uint) time.Time {
-	var expirationTime time.Time
-	now := time.Now().UTC()
-	expirationTime = now.Add(time.Duration(seconds) * time.Second)
-	return expirationTime
-}
-
-func createDeviceInfo(user *models.User) models.DeviceInfo {
-	return models.DeviceInfo{
-		Browser:                user.Browser,
-		BrowserVersion:         user.BrowserVersion,
-		OperatingSystem:        user.OperatingSystem,
-		OperatingSystemVersion: user.OperatingSystemVersion,
-		Cpu:                    user.Cpu,
-		Language:               user.Language,
-		Timezone:               user.Timezone,
-		CookiesEnabled:         user.CookiesEnabled,
-	}
 }

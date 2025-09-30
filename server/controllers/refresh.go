@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/baukunstpatrimonio/user-go/server/dto"
-	"github.com/baukunstpatrimonio/user-go/server/models"
-	pb "github.com/baukunstpatrimonio/user-go/server/user-pb"
+	"github.com/BaukunstPatrimonio/user-go/server/dto"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 	"github.com/golang-jwt/jwt/v5"
 )
 

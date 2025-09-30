@@ -1,4 +1,4 @@
-module github.com/baukunstpatrimonio/user-go
+module github.com/BaukunstPatrimonio/user-go
 
 go 1.23.2
 

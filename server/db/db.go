@@ -6,7 +6,7 @@ import (
 	"log"
 	"log/slog"
 
-	"github.com/baukunstpatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

@@ -3,10 +3,10 @@ package controllers
 import (
 	"context"
 
-	"github.com/baukunstpatrimonio/user-go/server/dto"
-	"github.com/baukunstpatrimonio/user-go/server/models"
-	"github.com/baukunstpatrimonio/user-go/server/services"
-	pb "github.com/baukunstpatrimonio/user-go/server/user-pb"
+	"github.com/BaukunstPatrimonio/user-go/server/dto"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/services"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 )
 
 type IControllerUser interface {

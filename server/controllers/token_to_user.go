@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/baukunstpatrimonio/user-go/server/dto"
-	"github.com/baukunstpatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/dto"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 	"github.com/golang-jwt/jwt/v5"
 )
 

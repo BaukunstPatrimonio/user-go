@@ -4,7 +4,7 @@ import (
 	"context"
 
 	entModels "github.com/alvarotor/entitier-go/models"
-	"github.com/baukunstpatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 )
 
 func (s userService) GetByEmail(ctx context.Context, email string) (*models.User, error) {

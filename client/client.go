@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/baukunstpatrimonio/user-go/client/health"
-	pb "github.com/baukunstpatrimonio/user-go/server/user-pb"
+	"github.com/BaukunstPatrimonio/user-go/client/health"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 )
 
 func main() {

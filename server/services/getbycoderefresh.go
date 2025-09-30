@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/baukunstpatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 )
 
 func (s userService) GetByCodeRefresh(ctx context.Context, code string) (*models.User, error) {

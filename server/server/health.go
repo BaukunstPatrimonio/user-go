@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	pb "github.com/baukunstpatrimonio/user-go/server/user-pb"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 )
 
 func (s *UserServer) Health(ctx context.Context, req *pb.UserIDRequest) (*pb.UserStatusResponse, error) {

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/alvarotor/entitier-go/repository"
-	"github.com/baukunstpatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 )
 
 type IUserService interface {

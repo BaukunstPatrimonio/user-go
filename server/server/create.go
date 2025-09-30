@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/baukunstpatrimonio/user-go/server/models"
-	pb "github.com/baukunstpatrimonio/user-go/server/user-pb"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 	"github.com/go-playground/validator/v10"
 )
 

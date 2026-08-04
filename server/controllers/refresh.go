@@ -40,15 +40,13 @@ func (u *controllerUser) refresh(ctx context.Context, refreshToken string, req *
 	}
 
 	if user == nil {
-		errMsg := "code refresh is invalid"
-		u.log.Error(errMsg)
-		return http.StatusBadRequest, &models.Token{}, errors.New(errMsg)
+		u.log.Error(models.ErrInvalidCode.Error())
+		return http.StatusBadRequest, &models.Token{}, models.ErrInvalidCode
 	}
 
 	if claims.CodeRefresh != user.CodeRefresh || u.conf.SizeRandomStringValidationRefresh != len(user.CodeRefresh) {
-		errMsg := "code refresh is invalid"
-		u.log.Error(errMsg)
-		return http.StatusBadRequest, &models.Token{}, errors.New(errMsg)
+		u.log.Error(models.ErrInvalidCode.Error())
+		return http.StatusBadRequest, &models.Token{}, models.ErrInvalidCode
 	}
 
 	storedDevice := createDeviceInfo(user)

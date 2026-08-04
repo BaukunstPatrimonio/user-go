@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -30,31 +31,47 @@ func (s refreshControllerStub) Refresh(context.Context, string, *pb.UserTokenReq
 func TestRefreshMapsAuthenticationFailuresToUnauthenticated(t *testing.T) {
 	tests := []struct {
 		name    string
-		err     error
+		target  error
 		message string
 	}{
-		{name: "invalid signature", err: errors.New(models.ErrInvalidSignature.Error()), message: models.ErrInvalidSignature.Error()},
-		{name: "malformed token", err: errors.New(models.ErrParsingToken.Error()), message: models.ErrParsingToken.Error()},
-		{name: "invalid token", err: errors.New(models.ErrInvalidToken.Error()), message: models.ErrInvalidToken.Error()},
-		{name: "expired token", err: errors.New(models.ErrTokenExpired.Error()), message: models.ErrTokenExpired.Error()},
-		{name: "stale token", err: models.ErrInvalidCode, message: models.ErrInvalidCode.Error()},
-		{name: "device mismatch", err: models.ErrSessionDeviceMismatch, message: "session_device_mismatch"},
+		{name: "invalid signature", target: models.ErrInvalidSignature, message: models.ErrInvalidSignature.Error()},
+		{name: "malformed token", target: models.ErrParsingToken, message: models.ErrParsingToken.Error()},
+		{name: "invalid token", target: models.ErrInvalidToken, message: models.ErrInvalidToken.Error()},
+		{name: "expired token", target: models.ErrTokenExpired, message: models.ErrTokenExpired.Error()},
+		{name: "stale token", target: models.ErrInvalidCode, message: models.ErrInvalidCode.Error()},
+		{name: "device mismatch", target: models.ErrSessionDeviceMismatch, message: "session_device_mismatch"},
 	}
 
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			server := NewServer(refreshControllerStub{err: test.err}, logger)
+			variants := []struct {
+				name    string
+				err     error
+				message string
+			}{
+				{name: "direct", err: test.target, message: test.message},
+				{name: "wrapped", err: fmt.Errorf("controller: %w", test.target), message: "controller: " + test.target.Error()},
+			}
+			if errors.Is(test.target, models.ErrSessionDeviceMismatch) {
+				variants[1].message = "session_device_mismatch"
+			}
 
-			response, err := server.Refresh(context.Background(), &pb.UserTokenRequest{})
-			if got, want := status.Code(err), codes.Unauthenticated; got != want {
-				t.Fatalf("Refresh() error code = %v, want %v", got, want)
-			}
-			if got := status.Convert(err).Message(); got != test.message {
-				t.Fatalf("Refresh() error message = %q, want %q", got, test.message)
-			}
-			if response == nil {
-				t.Fatal("Refresh() response = nil, want empty response")
+			for _, variant := range variants {
+				t.Run(variant.name, func(t *testing.T) {
+					server := NewServer(refreshControllerStub{err: variant.err}, logger)
+
+					response, err := server.Refresh(context.Background(), &pb.UserTokenRequest{})
+					if got, want := status.Code(err), codes.Unauthenticated; got != want {
+						t.Fatalf("Refresh() error code = %v, want %v", got, want)
+					}
+					if got := status.Convert(err).Message(); got != variant.message {
+						t.Fatalf("Refresh() error message = %q, want %q", got, variant.message)
+					}
+					if response == nil {
+						t.Fatal("Refresh() response = nil, want empty response")
+					}
+				})
 			}
 		})
 	}

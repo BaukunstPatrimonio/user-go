@@ -42,5 +42,5 @@ func (s *UserServer) Refresh(ctx context.Context, req *pb.UserTokenRequest) (*pb
 }
 
 func matchesRefreshError(err, target error) bool {
-	return errors.Is(err, target) || err.Error() == target.Error()
+	return errors.Is(err, target)
 }

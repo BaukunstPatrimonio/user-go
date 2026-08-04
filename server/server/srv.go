@@ -3,8 +3,8 @@ package server
 import (
 	"log/slog"
 
-	"github.com/alvarotor/user-go/server/controllers"
-	pb "github.com/alvarotor/user-go/server/user-pb"
+	"github.com/BaukunstPatrimonio/user-go/server/controllers"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 )
 
 type UserServer struct {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/alvarotor/user-go/server/dto"
-	"github.com/alvarotor/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/dto"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -65,21 +65,21 @@ func (u *controllerUser) TokenToUser(
 
 func (u *controllerUser) validateToken(tkn *jwt.Token, err error) error {
 	if errors.Is(err, jwt.ErrSignatureInvalid) {
-		return u.logAndReturnError(models.ErrInvalidSignature.Error())
+		return u.logAndReturnError(models.ErrInvalidSignature)
 	}
 	if errors.Is(err, jwt.ErrTokenExpired) {
-		return u.logAndReturnError(models.ErrTokenExpired.Error())
+		return u.logAndReturnError(models.ErrTokenExpired)
 	}
 	if err != nil {
-		return u.logAndReturnError(models.ErrParsingToken.Error())
+		return u.logAndReturnError(models.ErrParsingToken)
 	}
 	if !tkn.Valid {
-		return u.logAndReturnError(models.ErrInvalidToken.Error())
+		return u.logAndReturnError(models.ErrInvalidToken)
 	}
 	return nil
 }
 
-func (u *controllerUser) logAndReturnError(errMsg string) error {
-	u.log.Error(errMsg)
-	return errors.New(errMsg)
+func (u *controllerUser) logAndReturnError(err error) error {
+	u.log.Error(err.Error())
+	return err
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	pb "github.com/alvarotor/user-go/server/user-pb"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 )
 
 func (s *UserServer) Delete(ctx context.Context, req *pb.UserDeleteRequest) (*pb.UserStatusResponse, error) {

@@ -3,8 +3,8 @@ package controllers
 import (
 	"log/slog"
 
-	"github.com/alvarotor/user-go/server/models"
-	"github.com/alvarotor/user-go/server/services"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/services"
 )
 
 type controllerUser struct {

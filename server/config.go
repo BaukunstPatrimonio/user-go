@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/alvarotor/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 )
 
 func checkEnvVarsConf(conf *models.Config) {

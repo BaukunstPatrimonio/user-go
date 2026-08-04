@@ -3,9 +3,10 @@ package controllers
 import (
 	"context"
 
-	"github.com/alvarotor/user-go/server/dto"
-	"github.com/alvarotor/user-go/server/models"
-	"github.com/alvarotor/user-go/server/services"
+	"github.com/BaukunstPatrimonio/user-go/server/dto"
+	"github.com/BaukunstPatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/services"
+	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 )
 
 type IControllerUser interface {
@@ -16,5 +17,5 @@ type IControllerUser interface {
 	TokenToUser(context.Context, string, string, string, string, string, string, string, string, bool) (*models.User, error)
 	Health(context.Context, uint32) int
 	UpdateUserAdminStatus(context.Context, string, bool) error
-	Refresh(context.Context, string) (int, *models.Token, error)
+	Refresh(context.Context, string, *pb.UserTokenRequest) (int, *models.Token, error)
 }

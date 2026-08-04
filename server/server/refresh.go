@@ -15,10 +15,20 @@ func (s *UserServer) Refresh(ctx context.Context, req *pb.UserTokenRequest) (*pb
 	status, token, err := s.UserController.Refresh(ctx, req.GetToken(), req)
 	if err != nil {
 		s.Log.Error(err.Error())
-		if errors.Is(err, models.ErrSessionDeviceMismatch) {
+		switch {
+		case errors.Is(err, context.DeadlineExceeded):
+			return &pb.UserTokenResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
+		case matchesRefreshError(err, models.ErrInvalidSignature),
+			matchesRefreshError(err, models.ErrParsingToken),
+			matchesRefreshError(err, models.ErrInvalidToken),
+			matchesRefreshError(err, models.ErrTokenExpired),
+			matchesRefreshError(err, models.ErrInvalidCode):
+			return &pb.UserTokenResponse{}, grpcstatus.Error(codes.Unauthenticated, err.Error())
+		case matchesRefreshError(err, models.ErrSessionDeviceMismatch):
 			return &pb.UserTokenResponse{}, grpcstatus.Error(codes.Unauthenticated, "session_device_mismatch")
+		default:
+			return &pb.UserTokenResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 		}
-		return &pb.UserTokenResponse{}, err
 	}
 
 	return &pb.UserTokenResponse{
@@ -29,4 +39,8 @@ func (s *UserServer) Refresh(ctx context.Context, req *pb.UserTokenRequest) (*pb
 		Email:               token.Email,
 		Status:              uint32(status),
 	}, nil
+}
+
+func matchesRefreshError(err, target error) bool {
+	return errors.Is(err, target) || err.Error() == target.Error()
 }

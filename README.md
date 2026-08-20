@@ -4,7 +4,7 @@ A gRPC-based user management system implemented in Go that provides authenticati
 
 ## Features
 
-- User authentication (login/logout)
+- Passwordless validation-code and password authentication
 - User CRUD operations
 - Session management with JWT tokens
 - Email validation
@@ -83,12 +83,30 @@ The service provides the following gRPC endpoints:
 - `Update`: Update user profile
 - `Delete`: Delete user account
 - `List`: List all users
-- `Login`: Authenticate user
+- `Login`: Start the existing passwordless validation-code flow; preserves ePlace-compatible account creation behaviour
+- `LoginWithPassword`: Verify an existing validated user's password using exactly one of email or an account-bound E.164 phone, then return the normal access/refresh token response; it does not create accounts
+- `RegisterWithPassword`: Create a new unvalidated password account with an optional E.164 phone and return its verification code to a trusted internal gRPC caller; existing identities are rejected and no JWTs are returned
+- `RequestPasswordReset`: Create a short-lived reset token for an existing password account; the raw token is returned only to the trusted internal caller for email delivery
+- `ResetPassword`: Consume a reset token once, replace the Argon2id credential, and revoke the current refresh session without returning JWTs
+- `SetPhone`: Authenticate with the current access token and device claims, then associate or change that user's phone login identity
 - `LogOut`: End user session
 - `Validate`: Validate user email
 - `GetByEmail`: Retrieve user by email
 - `TokenToUser`: Convert JWT token to user information
 - `Refresh`: Refresh JWT token
+
+Authentication flows remain distinct:
+
+- Existing passwordless authentication: `Login` → `Validate`
+- Password registration: `RegisterWithPassword` → `Validate`
+- Later password sessions: `LoginWithPassword`
+- Password reset: `RequestPasswordReset` → email delivery by the consuming application → `ResetPassword` → `LoginWithPassword`
+
+New registration passwords must contain 8–128 Unicode characters and are stored only as Argon2id hashes. The registration verification code is intended for a trusted backend or notification service and must not be echoed by a public browser-facing API. Password registration does not authenticate immediately, cannot claim an existing email, and stores no Hortatech-specific roles or profile data.
+
+Password reset tokens contain 32 random bytes, expire after 30 minutes, and are persisted only as SHA-256 digests. A new request supersedes the user's previous token. Unknown and passwordless accounts receive the same accepted status without creating reset state; a future public REST facade must keep that response generic. `user-go` does not send reset email, reset does not authenticate automatically, and existing access JWTs remain valid until expiry because only the current refresh session can be revoked by the present session architecture.
+
+Phone login identities must be supplied in canonical international E.164 form (for example, `+34600111222`). `user-go` trims surrounding whitespace but does not infer Spain, `+34`, or any other country code. `phone_e164` is an account-bound login identifier attached during password registration or by an already authenticated user through `SetPhone`; it is not independently SMS/OTP-verified. `SetPhone` does not create a password credential, so attaching a phone to a passwordless ePlace account does not enable password login. Phone removal is not supported in this phase, and password reset remains email-only.
 
 ## Client Usage Example
 

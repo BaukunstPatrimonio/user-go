@@ -26,7 +26,7 @@ func GetDB_PG(cfg *models.Config, l *slog.Logger) *gorm.DB {
 
 	l.Info("DB PostGres Connection established!")
 
-	if err = db.AutoMigrate(&models.User{}); err != nil {
+	if err = db.AutoMigrate(&models.User{}, &models.PasswordCredential{}, &models.PasswordResetToken{}); err != nil {
 		log.Fatal("failed to AutoMigrate database PostGres")
 		if db.Migrator().HasTable(&models.User{}) {
 			if err := db.First(&models.User{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {

@@ -12,6 +12,11 @@ import (
 type IControllerUser interface {
 	services.IUserService
 	Login(context.Context, dto.UserLogin) (int, string, error)
+	LoginWithPassword(context.Context, dto.UserLoginWithPassword) (int, *models.Token, error)
+	RegisterWithPassword(context.Context, dto.UserRegisterWithPassword) (int, *models.PasswordRegistration, error)
+	RequestPasswordReset(context.Context, dto.UserRequestPasswordReset) (int, *models.PasswordResetRequest, error)
+	ResetPassword(context.Context, dto.UserResetPassword) (int, error)
+	SetPhone(context.Context, dto.UserSetPhone) (int, *models.User, error)
 	LogOut(context.Context, string) (int, error)
 	Validate(context.Context, string) (int, models.Token, error)
 	TokenToUser(context.Context, string, string, string, string, string, string, string, string, bool) (*models.User, error)

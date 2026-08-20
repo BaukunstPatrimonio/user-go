@@ -15,14 +15,16 @@ func (s *UserServer) Get(ctx context.Context, req *pb.UserIDRequest) (*pb.UserRe
 	}
 
 	return &pb.UserResponse{
-		Email:           user.Email,
-		Name:            user.Name,
-		ProfilePic:      user.ProfilePic,
-		Validated:       user.Validated,
-		Admin:           user.Admin,
-		SuperAdmin:      user.SuperAdmin,
-		Code:            user.Code,
-		CodeExpire:      timestamppb.New(user.CodeExpire),
-		Bucket:          user.Bucket,
+		Id:         uint64(user.ID),
+		Email:      user.Email,
+		PhoneE164:  phoneE164Value(user.PhoneE164),
+		Name:       user.Name,
+		ProfilePic: user.ProfilePic,
+		Validated:  user.Validated,
+		Admin:      user.Admin,
+		SuperAdmin: user.SuperAdmin,
+		Code:       user.Code,
+		CodeExpire: timestamppb.New(user.CodeExpire),
+		Bucket:     user.Bucket,
 	}, nil
 }

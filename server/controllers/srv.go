@@ -4,13 +4,15 @@ import (
 	"log/slog"
 
 	"github.com/BaukunstPatrimonio/user-go/server/models"
+	"github.com/BaukunstPatrimonio/user-go/server/password"
 	"github.com/BaukunstPatrimonio/user-go/server/services"
 )
 
 type controllerUser struct {
 	services.IUserService
-	log  *slog.Logger
-	conf *models.Config
+	log       *slog.Logger
+	conf      *models.Config
+	passwords password.Manager
 }
 
 func NewUserController(log *slog.Logger, svc services.IUserService, conf *models.Config) IControllerUser {
@@ -18,5 +20,6 @@ func NewUserController(log *slog.Logger, svc services.IUserService, conf *models
 		IUserService: svc,
 		log:          log,
 		conf:         conf,
+		passwords:    password.NewDefaultManager(),
 	}
 }

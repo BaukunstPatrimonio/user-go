@@ -8,15 +8,18 @@ import (
 
 type userService struct {
 	repository.IGenericRepo[models.User, uint]
-	db *gorm.DB
+	passwordCredentials repository.IGenericRepo[models.PasswordCredential, uint]
+	db                  *gorm.DB
 }
 
 func NewUserService(
 	db *gorm.DB,
 ) IUserService {
 	repo := repository.NewGenericRepository[models.User, uint](db)
+	passwordCredentials := repository.NewGenericRepository[models.PasswordCredential, uint](db)
 	return &userService{
-		IGenericRepo: repo,
-		db:           db,
+		IGenericRepo:        repo,
+		passwordCredentials: passwordCredentials,
+		db:                  db,
 	}
 }

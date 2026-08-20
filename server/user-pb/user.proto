@@ -14,6 +14,11 @@ service User {
   rpc Delete (UserDeleteRequest) returns (UserStatusResponse) {}
   rpc List (google.protobuf.Empty) returns (ListUsersResponse) {}
   rpc Login (UserLoginRequest) returns (UserLoginResponse) {}
+  rpc LoginWithPassword (UserLoginWithPasswordRequest) returns (UserTokenResponse) {}
+  rpc RegisterWithPassword (UserRegisterWithPasswordRequest) returns (UserRegisterWithPasswordResponse) {}
+  rpc RequestPasswordReset (UserRequestPasswordResetRequest) returns (UserRequestPasswordResetResponse) {}
+  rpc ResetPassword (UserResetPasswordRequest) returns (UserResetPasswordResponse) {}
+  rpc SetPhone (UserSetPhoneRequest) returns (UserResponse) {}
   rpc LogOut (UserMailRequest) returns (UserStatusResponse) {}
   rpc Validate (UserValidateRequest) returns (UserTokenResponse) {}
   rpc GetByEmail (UserMailRequest) returns (UserResponse) {}
@@ -101,6 +106,8 @@ message UserResponse {
   string code = 7;
   google.protobuf.Timestamp code_expire = 8;
   string bucket = 9;
+  uint64 id = 10;
+  string phone_e164 = 11;
 }
 
 message UserValidateRequest {
@@ -124,4 +131,68 @@ message UserTokenResponse {
 message UpdateUserAdminRequest {
   string email = 1;
   bool admin = 2;
+}
+
+message UserLoginWithPasswordRequest {
+  string email = 1;
+  string password = 2;
+  string browser = 3;
+  string browser_version = 4;
+  string operating_system = 5;
+  string operating_system_version = 6;
+  string cpu = 7;
+  string language = 8;
+  string timezone = 9;
+  bool cookies_enabled = 10;
+  string phone_e164 = 11;
+}
+
+message UserRegisterWithPasswordRequest {
+  string email = 1;
+  string name = 2;
+  string password = 3;
+  string browser = 4;
+  string browser_version = 5;
+  string operating_system = 6;
+  string operating_system_version = 7;
+  string cpu = 8;
+  string language = 9;
+  string timezone = 10;
+  bool cookies_enabled = 11;
+  string phone_e164 = 12;
+}
+
+// verification_code crosses a trusted internal gRPC boundary so a consuming
+// backend can deliver it. Public browser-facing APIs must not echo it.
+message UserRegisterWithPasswordResponse {
+  uint64 user_id = 1;
+  string verification_code = 2;
+  google.protobuf.Timestamp code_expires = 3;
+  uint32 status = 4;
+}
+
+message UserRequestPasswordResetRequest {
+  string email = 1;
+}
+
+// reset_token crosses a trusted internal gRPC boundary for email delivery.
+// Public browser-facing APIs must always return a generic accepted response.
+message UserRequestPasswordResetResponse {
+  string reset_token = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  uint32 status = 3;
+}
+
+message UserResetPasswordRequest {
+  string reset_token = 1;
+  string new_password = 2;
+}
+
+message UserResetPasswordResponse {
+  uint32 status = 1;
+}
+
+message UserSetPhoneRequest {
+  UserTokenRequest auth = 1;
+  string phone_e164 = 2;
 }

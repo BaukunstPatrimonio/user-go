@@ -7,6 +7,7 @@ require (
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/joho/godotenv v1.5.1
+	golang.org/x/crypto v0.28.0
 	golang.org/x/exp v0.0.0-20241215155358-4a5509556b9e
 	google.golang.org/grpc v1.69.0
 	google.golang.org/protobuf v1.35.2
@@ -25,7 +26,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect

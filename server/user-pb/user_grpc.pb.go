@@ -26,6 +26,11 @@ const (
 	User_Delete_FullMethodName                = "/user_pb.User/Delete"
 	User_List_FullMethodName                  = "/user_pb.User/List"
 	User_Login_FullMethodName                 = "/user_pb.User/Login"
+	User_LoginWithPassword_FullMethodName     = "/user_pb.User/LoginWithPassword"
+	User_RegisterWithPassword_FullMethodName  = "/user_pb.User/RegisterWithPassword"
+	User_RequestPasswordReset_FullMethodName  = "/user_pb.User/RequestPasswordReset"
+	User_ResetPassword_FullMethodName         = "/user_pb.User/ResetPassword"
+	User_SetPhone_FullMethodName              = "/user_pb.User/SetPhone"
 	User_LogOut_FullMethodName                = "/user_pb.User/LogOut"
 	User_Validate_FullMethodName              = "/user_pb.User/Validate"
 	User_GetByEmail_FullMethodName            = "/user_pb.User/GetByEmail"
@@ -45,6 +50,11 @@ type UserClient interface {
 	Delete(ctx context.Context, in *UserDeleteRequest, opts ...grpc.CallOption) (*UserStatusResponse, error)
 	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListUsersResponse, error)
 	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
+	LoginWithPassword(ctx context.Context, in *UserLoginWithPasswordRequest, opts ...grpc.CallOption) (*UserTokenResponse, error)
+	RegisterWithPassword(ctx context.Context, in *UserRegisterWithPasswordRequest, opts ...grpc.CallOption) (*UserRegisterWithPasswordResponse, error)
+	RequestPasswordReset(ctx context.Context, in *UserRequestPasswordResetRequest, opts ...grpc.CallOption) (*UserRequestPasswordResetResponse, error)
+	ResetPassword(ctx context.Context, in *UserResetPasswordRequest, opts ...grpc.CallOption) (*UserResetPasswordResponse, error)
+	SetPhone(ctx context.Context, in *UserSetPhoneRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	LogOut(ctx context.Context, in *UserMailRequest, opts ...grpc.CallOption) (*UserStatusResponse, error)
 	Validate(ctx context.Context, in *UserValidateRequest, opts ...grpc.CallOption) (*UserTokenResponse, error)
 	GetByEmail(ctx context.Context, in *UserMailRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -116,6 +126,56 @@ func (c *userClient) Login(ctx context.Context, in *UserLoginRequest, opts ...gr
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserLoginResponse)
 	err := c.cc.Invoke(ctx, User_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) LoginWithPassword(ctx context.Context, in *UserLoginWithPasswordRequest, opts ...grpc.CallOption) (*UserTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserTokenResponse)
+	err := c.cc.Invoke(ctx, User_LoginWithPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) RegisterWithPassword(ctx context.Context, in *UserRegisterWithPasswordRequest, opts ...grpc.CallOption) (*UserRegisterWithPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserRegisterWithPasswordResponse)
+	err := c.cc.Invoke(ctx, User_RegisterWithPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) RequestPasswordReset(ctx context.Context, in *UserRequestPasswordResetRequest, opts ...grpc.CallOption) (*UserRequestPasswordResetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserRequestPasswordResetResponse)
+	err := c.cc.Invoke(ctx, User_RequestPasswordReset_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ResetPassword(ctx context.Context, in *UserResetPasswordRequest, opts ...grpc.CallOption) (*UserResetPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserResetPasswordResponse)
+	err := c.cc.Invoke(ctx, User_ResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) SetPhone(ctx context.Context, in *UserSetPhoneRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, User_SetPhone_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -202,6 +262,11 @@ type UserServer interface {
 	Delete(context.Context, *UserDeleteRequest) (*UserStatusResponse, error)
 	List(context.Context, *emptypb.Empty) (*ListUsersResponse, error)
 	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
+	LoginWithPassword(context.Context, *UserLoginWithPasswordRequest) (*UserTokenResponse, error)
+	RegisterWithPassword(context.Context, *UserRegisterWithPasswordRequest) (*UserRegisterWithPasswordResponse, error)
+	RequestPasswordReset(context.Context, *UserRequestPasswordResetRequest) (*UserRequestPasswordResetResponse, error)
+	ResetPassword(context.Context, *UserResetPasswordRequest) (*UserResetPasswordResponse, error)
+	SetPhone(context.Context, *UserSetPhoneRequest) (*UserResponse, error)
 	LogOut(context.Context, *UserMailRequest) (*UserStatusResponse, error)
 	Validate(context.Context, *UserValidateRequest) (*UserTokenResponse, error)
 	GetByEmail(context.Context, *UserMailRequest) (*UserResponse, error)
@@ -236,6 +301,21 @@ func (UnimplementedUserServer) List(context.Context, *emptypb.Empty) (*ListUsers
 }
 func (UnimplementedUserServer) Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUserServer) LoginWithPassword(context.Context, *UserLoginWithPasswordRequest) (*UserTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginWithPassword not implemented")
+}
+func (UnimplementedUserServer) RegisterWithPassword(context.Context, *UserRegisterWithPasswordRequest) (*UserRegisterWithPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterWithPassword not implemented")
+}
+func (UnimplementedUserServer) RequestPasswordReset(context.Context, *UserRequestPasswordResetRequest) (*UserRequestPasswordResetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestPasswordReset not implemented")
+}
+func (UnimplementedUserServer) ResetPassword(context.Context, *UserResetPasswordRequest) (*UserResetPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedUserServer) SetPhone(context.Context, *UserSetPhoneRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetPhone not implemented")
 }
 func (UnimplementedUserServer) LogOut(context.Context, *UserMailRequest) (*UserStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogOut not implemented")
@@ -383,6 +463,96 @@ func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).Login(ctx, req.(*UserLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_LoginWithPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLoginWithPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).LoginWithPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_LoginWithPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).LoginWithPassword(ctx, req.(*UserLoginWithPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_RegisterWithPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRegisterWithPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).RegisterWithPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_RegisterWithPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).RegisterWithPassword(ctx, req.(*UserRegisterWithPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_RequestPasswordReset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRequestPasswordResetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).RequestPasswordReset(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_RequestPasswordReset_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).RequestPasswordReset(ctx, req.(*UserRequestPasswordResetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ResetPassword(ctx, req.(*UserResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_SetPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSetPhoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).SetPhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_SetPhone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).SetPhone(ctx, req.(*UserSetPhoneRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -543,6 +713,26 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _User_Login_Handler,
+		},
+		{
+			MethodName: "LoginWithPassword",
+			Handler:    _User_LoginWithPassword_Handler,
+		},
+		{
+			MethodName: "RegisterWithPassword",
+			Handler:    _User_RegisterWithPassword_Handler,
+		},
+		{
+			MethodName: "RequestPasswordReset",
+			Handler:    _User_RequestPasswordReset_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _User_ResetPassword_Handler,
+		},
+		{
+			MethodName: "SetPhone",
+			Handler:    _User_SetPhone_Handler,
 		},
 		{
 			MethodName: "LogOut",

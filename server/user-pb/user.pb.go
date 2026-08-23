@@ -1948,7 +1948,7 @@ const file_server_user_pb_user_proto_rawDesc = "" +
 	"\x17UserChangeEmailResponse\x12+\n" +
 	"\x11verification_code\x18\x01 \x01(\tR\x10verificationCode\x12=\n" +
 	"\fcode_expires\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\vcodeExpires\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\rR\x06status2\xee\v\n" +
+	"\x06status\x18\x03 \x01(\rR\x06status2\xb3\f\n" +
 	"\x04User\x129\n" +
 	"\x06Create\x12\x14.user_pb.UserRequest\x1a\x17.user_pb.UserIDResponse\"\x00\x126\n" +
 	"\x03Get\x12\x16.user_pb.UserIDRequest\x1a\x15.user_pb.UserResponse\"\x00\x12C\n" +
@@ -1964,7 +1964,9 @@ const file_server_user_pb_user_proto_rawDesc = "" +
 	"\x0eChangePassword\x12\".user_pb.UserChangePasswordRequest\x1a\x1b.user_pb.UserStatusResponse\"\x00\x12R\n" +
 	"\vChangeEmail\x12\x1f.user_pb.UserChangeEmailRequest\x1a .user_pb.UserChangeEmailResponse\"\x00\x12A\n" +
 	"\x06LogOut\x12\x18.user_pb.UserMailRequest\x1a\x1b.user_pb.UserStatusResponse\"\x00\x12F\n" +
-	"\bValidate\x12\x1c.user_pb.UserValidateRequest\x1a\x1a.user_pb.UserTokenResponse\"\x00\x12?\n" +
+	"\bValidate\x12\x1c.user_pb.UserValidateRequest\x1a\x1a.user_pb.UserTokenResponse\"\x00\x12C\n" +
+	"\n" +
+	"VerifyUser\x12\x16.user_pb.UserIDRequest\x1a\x1b.user_pb.UserStatusResponse\"\x00\x12?\n" +
 	"\n" +
 	"GetByEmail\x12\x18.user_pb.UserMailRequest\x1a\x15.user_pb.UserResponse\"\x00\x12A\n" +
 	"\vTokenToUser\x12\x19.user_pb.UserTokenRequest\x1a\x15.user_pb.UserResponse\"\x00\x12?\n" +
@@ -2042,33 +2044,35 @@ var file_server_user_pb_user_proto_depIdxs = []int32{
 	24, // 23: user_pb.User.ChangeEmail:input_type -> user_pb.UserChangeEmailRequest
 	2,  // 24: user_pb.User.LogOut:input_type -> user_pb.UserMailRequest
 	11, // 25: user_pb.User.Validate:input_type -> user_pb.UserValidateRequest
-	2,  // 26: user_pb.User.GetByEmail:input_type -> user_pb.UserMailRequest
-	3,  // 27: user_pb.User.TokenToUser:input_type -> user_pb.UserTokenRequest
-	4,  // 28: user_pb.User.Health:input_type -> user_pb.UserIDRequest
-	14, // 29: user_pb.User.UpdateUserAdminStatus:input_type -> user_pb.UpdateUserAdminRequest
-	3,  // 30: user_pb.User.Refresh:input_type -> user_pb.UserTokenRequest
-	7,  // 31: user_pb.User.Create:output_type -> user_pb.UserIDResponse
-	10, // 32: user_pb.User.Get:output_type -> user_pb.UserResponse
-	8,  // 33: user_pb.User.Update:output_type -> user_pb.UserStatusResponse
-	8,  // 34: user_pb.User.Delete:output_type -> user_pb.UserStatusResponse
-	9,  // 35: user_pb.User.List:output_type -> user_pb.ListUsersResponse
-	12, // 36: user_pb.User.Login:output_type -> user_pb.UserLoginResponse
-	13, // 37: user_pb.User.LoginWithPassword:output_type -> user_pb.UserTokenResponse
-	17, // 38: user_pb.User.RegisterWithPassword:output_type -> user_pb.UserRegisterWithPasswordResponse
-	19, // 39: user_pb.User.RequestPasswordReset:output_type -> user_pb.UserRequestPasswordResetResponse
-	21, // 40: user_pb.User.ResetPassword:output_type -> user_pb.UserResetPasswordResponse
-	10, // 41: user_pb.User.SetPhone:output_type -> user_pb.UserResponse
-	8,  // 42: user_pb.User.ChangePassword:output_type -> user_pb.UserStatusResponse
-	25, // 43: user_pb.User.ChangeEmail:output_type -> user_pb.UserChangeEmailResponse
-	8,  // 44: user_pb.User.LogOut:output_type -> user_pb.UserStatusResponse
-	13, // 45: user_pb.User.Validate:output_type -> user_pb.UserTokenResponse
-	10, // 46: user_pb.User.GetByEmail:output_type -> user_pb.UserResponse
-	10, // 47: user_pb.User.TokenToUser:output_type -> user_pb.UserResponse
-	8,  // 48: user_pb.User.Health:output_type -> user_pb.UserStatusResponse
-	8,  // 49: user_pb.User.UpdateUserAdminStatus:output_type -> user_pb.UserStatusResponse
-	13, // 50: user_pb.User.Refresh:output_type -> user_pb.UserTokenResponse
-	31, // [31:51] is the sub-list for method output_type
-	11, // [11:31] is the sub-list for method input_type
+	4,  // 26: user_pb.User.VerifyUser:input_type -> user_pb.UserIDRequest
+	2,  // 27: user_pb.User.GetByEmail:input_type -> user_pb.UserMailRequest
+	3,  // 28: user_pb.User.TokenToUser:input_type -> user_pb.UserTokenRequest
+	4,  // 29: user_pb.User.Health:input_type -> user_pb.UserIDRequest
+	14, // 30: user_pb.User.UpdateUserAdminStatus:input_type -> user_pb.UpdateUserAdminRequest
+	3,  // 31: user_pb.User.Refresh:input_type -> user_pb.UserTokenRequest
+	7,  // 32: user_pb.User.Create:output_type -> user_pb.UserIDResponse
+	10, // 33: user_pb.User.Get:output_type -> user_pb.UserResponse
+	8,  // 34: user_pb.User.Update:output_type -> user_pb.UserStatusResponse
+	8,  // 35: user_pb.User.Delete:output_type -> user_pb.UserStatusResponse
+	9,  // 36: user_pb.User.List:output_type -> user_pb.ListUsersResponse
+	12, // 37: user_pb.User.Login:output_type -> user_pb.UserLoginResponse
+	13, // 38: user_pb.User.LoginWithPassword:output_type -> user_pb.UserTokenResponse
+	17, // 39: user_pb.User.RegisterWithPassword:output_type -> user_pb.UserRegisterWithPasswordResponse
+	19, // 40: user_pb.User.RequestPasswordReset:output_type -> user_pb.UserRequestPasswordResetResponse
+	21, // 41: user_pb.User.ResetPassword:output_type -> user_pb.UserResetPasswordResponse
+	10, // 42: user_pb.User.SetPhone:output_type -> user_pb.UserResponse
+	8,  // 43: user_pb.User.ChangePassword:output_type -> user_pb.UserStatusResponse
+	25, // 44: user_pb.User.ChangeEmail:output_type -> user_pb.UserChangeEmailResponse
+	8,  // 45: user_pb.User.LogOut:output_type -> user_pb.UserStatusResponse
+	13, // 46: user_pb.User.Validate:output_type -> user_pb.UserTokenResponse
+	8,  // 47: user_pb.User.VerifyUser:output_type -> user_pb.UserStatusResponse
+	10, // 48: user_pb.User.GetByEmail:output_type -> user_pb.UserResponse
+	10, // 49: user_pb.User.TokenToUser:output_type -> user_pb.UserResponse
+	8,  // 50: user_pb.User.Health:output_type -> user_pb.UserStatusResponse
+	8,  // 51: user_pb.User.UpdateUserAdminStatus:output_type -> user_pb.UserStatusResponse
+	13, // 52: user_pb.User.Refresh:output_type -> user_pb.UserTokenResponse
+	32, // [32:53] is the sub-list for method output_type
+	11, // [11:32] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name
 	11, // [11:11] is the sub-list for extension extendee
 	0,  // [0:11] is the sub-list for field type_name

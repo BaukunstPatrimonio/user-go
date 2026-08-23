@@ -26,5 +26,6 @@ type IUserService interface {
 	StartPasswordSession(context.Context, uint, models.DeviceInfo, string, time.Time, string) error
 	UpdateRefreshSession(context.Context, uint, models.DeviceInfo, string, string) error
 	ValidateSvc(context.Context, string) error
+	VerifyUserSvc(context.Context, uint) error
 	LogOutSvc(context.Context, string) error
 }

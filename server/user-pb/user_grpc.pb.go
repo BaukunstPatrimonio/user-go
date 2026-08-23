@@ -35,6 +35,7 @@ const (
 	User_ChangeEmail_FullMethodName           = "/user_pb.User/ChangeEmail"
 	User_LogOut_FullMethodName                = "/user_pb.User/LogOut"
 	User_Validate_FullMethodName              = "/user_pb.User/Validate"
+	User_VerifyUser_FullMethodName            = "/user_pb.User/VerifyUser"
 	User_GetByEmail_FullMethodName            = "/user_pb.User/GetByEmail"
 	User_TokenToUser_FullMethodName           = "/user_pb.User/TokenToUser"
 	User_Health_FullMethodName                = "/user_pb.User/Health"
@@ -61,6 +62,9 @@ type UserClient interface {
 	ChangeEmail(ctx context.Context, in *UserChangeEmailRequest, opts ...grpc.CallOption) (*UserChangeEmailResponse, error)
 	LogOut(ctx context.Context, in *UserMailRequest, opts ...grpc.CallOption) (*UserStatusResponse, error)
 	Validate(ctx context.Context, in *UserValidateRequest, opts ...grpc.CallOption) (*UserTokenResponse, error)
+	// Administrative identity verification for a known canonical user ID. Project
+	// authorization remains the responsibility of the calling application.
+	VerifyUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserStatusResponse, error)
 	GetByEmail(ctx context.Context, in *UserMailRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	TokenToUser(ctx context.Context, in *UserTokenRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	Health(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserStatusResponse, error)
@@ -226,6 +230,16 @@ func (c *userClient) Validate(ctx context.Context, in *UserValidateRequest, opts
 	return out, nil
 }
 
+func (c *userClient) VerifyUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserStatusResponse)
+	err := c.cc.Invoke(ctx, User_VerifyUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) GetByEmail(ctx context.Context, in *UserMailRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
@@ -295,6 +309,9 @@ type UserServer interface {
 	ChangeEmail(context.Context, *UserChangeEmailRequest) (*UserChangeEmailResponse, error)
 	LogOut(context.Context, *UserMailRequest) (*UserStatusResponse, error)
 	Validate(context.Context, *UserValidateRequest) (*UserTokenResponse, error)
+	// Administrative identity verification for a known canonical user ID. Project
+	// authorization remains the responsibility of the calling application.
+	VerifyUser(context.Context, *UserIDRequest) (*UserStatusResponse, error)
 	GetByEmail(context.Context, *UserMailRequest) (*UserResponse, error)
 	TokenToUser(context.Context, *UserTokenRequest) (*UserResponse, error)
 	Health(context.Context, *UserIDRequest) (*UserStatusResponse, error)
@@ -354,6 +371,9 @@ func (UnimplementedUserServer) LogOut(context.Context, *UserMailRequest) (*UserS
 }
 func (UnimplementedUserServer) Validate(context.Context, *UserValidateRequest) (*UserTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Validate not implemented")
+}
+func (UnimplementedUserServer) VerifyUser(context.Context, *UserIDRequest) (*UserStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyUser not implemented")
 }
 func (UnimplementedUserServer) GetByEmail(context.Context, *UserMailRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByEmail not implemented")
@@ -661,6 +681,24 @@ func _User_Validate_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_VerifyUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).VerifyUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_VerifyUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).VerifyUser(ctx, req.(*UserIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserMailRequest)
 	if err := dec(in); err != nil {
@@ -817,6 +855,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Validate",
 			Handler:    _User_Validate_Handler,
+		},
+		{
+			MethodName: "VerifyUser",
+			Handler:    _User_VerifyUser_Handler,
 		},
 		{
 			MethodName: "GetByEmail",

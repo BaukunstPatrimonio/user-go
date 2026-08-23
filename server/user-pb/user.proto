@@ -23,6 +23,9 @@ service User {
   rpc ChangeEmail (UserChangeEmailRequest) returns (UserChangeEmailResponse) {}
   rpc LogOut (UserMailRequest) returns (UserStatusResponse) {}
   rpc Validate (UserValidateRequest) returns (UserTokenResponse) {}
+  // Administrative identity verification for a known canonical user ID. Project
+  // authorization remains the responsibility of the calling application.
+  rpc VerifyUser (UserIDRequest) returns (UserStatusResponse) {}
   rpc GetByEmail (UserMailRequest) returns (UserResponse) {}
   rpc TokenToUser (UserTokenRequest) returns (UserResponse) {}
   rpc Health (UserIDRequest) returns (UserStatusResponse) {}

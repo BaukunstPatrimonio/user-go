@@ -189,7 +189,7 @@ func TestResetPasswordRejectsMalformedTokenAndRegistrationPolicyViolation(t *tes
 		err        error
 	}{
 		{name: "malformed token", reset: dto.UserResetPassword{ResetToken: "not-a-generated-token", NewPassword: resetNewFakePassword}, statusCode: http.StatusUnauthorized, err: models.ErrInvalidPasswordResetToken},
-		{name: "short password", reset: dto.UserResetPassword{ResetToken: "not-used", NewPassword: "short"}, statusCode: http.StatusBadRequest, err: models.ErrInvalidPassword},
+		{name: "empty password", reset: dto.UserResetPassword{ResetToken: "not-used", NewPassword: ""}, statusCode: http.StatusBadRequest, err: models.ErrInvalidPassword},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

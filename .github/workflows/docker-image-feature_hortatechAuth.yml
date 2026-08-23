@@ -2,7 +2,7 @@ name: Deploy API Dev
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "feature_hortatechAuth" ]
 
 permissions:
   contents: read
@@ -34,5 +34,5 @@ jobs:
       with:
         push: true
         tags: |
-          ghcr.io/baukunstpatrimonio/user-go:dev-latest
-          ghcr.io/baukunstpatrimonio/user-go:dev-${{ env.TAG }}
+          ghcr.io/baukunstpatrimonio/user-go:feature_hortatechAuth-latest
+          ghcr.io/baukunstpatrimonio/user-go:feature_hortatechAuth-${{ env.TAG }}

@@ -40,7 +40,6 @@ func TestRegisterWithPasswordRejectsInvalidRequests(t *testing.T) {
 		{name: "malformed email", req: &pb.UserRegisterWithPasswordRequest{Email: "not-an-email", Name: "Person", Password: "fake-password"}},
 		{name: "missing name", req: &pb.UserRegisterWithPasswordRequest{Email: "person@example.com", Password: "fake-password"}},
 		{name: "missing password", req: &pb.UserRegisterWithPasswordRequest{Email: "person@example.com", Name: "Person"}},
-		{name: "short password", req: &pb.UserRegisterWithPasswordRequest{Email: "person@example.com", Name: "Person", Password: "short"}},
 		{name: "long password", req: &pb.UserRegisterWithPasswordRequest{Email: "person@example.com", Name: "Person", Password: strings.Repeat("a", 129)}},
 		{name: "invalid phone", req: &pb.UserRegisterWithPasswordRequest{Email: "person@example.com", Name: "Person", Password: "phase-three-fake-password!", PhoneE164: "600111222"}},
 	}
@@ -57,6 +56,21 @@ func TestRegisterWithPasswordRejectsInvalidRequests(t *testing.T) {
 				t.Fatalf("invalid request reached controller or returned nil response: registration %#v response %#v", controller.registration, response)
 			}
 		})
+	}
+}
+
+func TestRegisterWithPasswordAcceptsExistingHortaTechPassword(t *testing.T) {
+	controller := &passwordRegistrationControllerStub{
+		statusCode: http.StatusCreated,
+		result:     &models.PasswordRegistration{UserID: 583},
+	}
+	server := NewServer(controller, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	req := validPasswordRegistrationRequest()
+	req.Password = "hola"
+
+	response, err := server.RegisterWithPassword(context.Background(), req)
+	if err != nil || response.GetStatus() != http.StatusCreated || controller.registration.Password != "hola" {
+		t.Fatalf("RegisterWithPassword() = %#v, %v registration=%#v", response, err, controller.registration)
 	}
 }
 

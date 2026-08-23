@@ -24,10 +24,11 @@ func TestValidateRegistrationPassword(t *testing.T) {
 		valid    bool
 	}{
 		{name: "minimum", password: strings.Repeat("a", RegistrationMinimumLength), valid: true},
+		{name: "existing frontend password", password: "hola", valid: true},
 		{name: "long passphrase", password: strings.Repeat("word ", 20), valid: true},
 		{name: "unicode counts as characters", password: strings.Repeat("ñ", RegistrationMinimumLength), valid: true},
 		{name: "invalid utf8", password: string([]byte{0xff, 0xfe, 0xfd})},
-		{name: "too short", password: strings.Repeat("a", RegistrationMinimumLength-1)},
+		{name: "empty", password: ""},
 		{name: "too long", password: strings.Repeat("a", RegistrationMaximumLength+1)},
 	}
 	for _, test := range tests {
@@ -40,6 +41,15 @@ func TestValidateRegistrationPassword(t *testing.T) {
 				t.Fatalf("ValidateRegistrationPassword() error = %v, want %v", err, ErrInvalidLength)
 			}
 		})
+	}
+}
+
+func TestValidateResetPasswordUsesExistingFrontendMinimum(t *testing.T) {
+	if err := ValidateResetPassword("hola"); err != nil {
+		t.Fatalf("ValidateResetPassword(hola) = %v, want nil", err)
+	}
+	if err := ValidateResetPassword(""); !errors.Is(err, ErrInvalidLength) {
+		t.Fatalf("ValidateResetPassword(empty) = %v, want %v", err, ErrInvalidLength)
 	}
 }
 

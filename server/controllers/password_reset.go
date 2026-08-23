@@ -44,7 +44,7 @@ func (u *controllerUser) RequestPasswordReset(ctx context.Context, request dto.U
 }
 
 func (u *controllerUser) ResetPassword(ctx context.Context, reset dto.UserResetPassword) (int, error) {
-	if err := passwordService.ValidateRegistrationPassword(reset.NewPassword); err != nil {
+	if err := passwordService.ValidateResetPassword(reset.NewPassword); err != nil {
 		return http.StatusBadRequest, models.ErrInvalidPassword
 	}
 	tokenDigest, err := passwordreset.DigestToken(reset.ResetToken)

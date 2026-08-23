@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -94,7 +95,7 @@ func TestResetPasswordValidatesRequestAndMapsErrors(t *testing.T) {
 	invalidRequests := []*pb.UserResetPasswordRequest{
 		{NewPassword: "valid-fake-password!"},
 		{ResetToken: "token"},
-		{ResetToken: "token", NewPassword: "short"},
+		{ResetToken: "token", NewPassword: strings.Repeat("a", 129)},
 	}
 	for _, request := range invalidRequests {
 		controller := &passwordResetControllerStub{}

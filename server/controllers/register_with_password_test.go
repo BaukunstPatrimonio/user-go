@@ -233,10 +233,20 @@ func TestRegisterWithPasswordRejectsDuplicatePhoneWithoutChangingAccount(t *test
 func TestRegisterWithPasswordRejectsInvalidPasswordWithoutPersistence(t *testing.T) {
 	controller, service, _ := newPasswordRegistrationController()
 	statusCode, _, err := controller.RegisterWithPassword(context.Background(), dto.UserRegisterWithPassword{
-		Email: "new@example.com", Name: "New User", Password: "short", DeviceInfo: authRegressionDevice(),
+		Email: "new@example.com", Name: "New User", Password: "", DeviceInfo: authRegressionDevice(),
 	})
 	if statusCode != http.StatusBadRequest || !errors.Is(err, models.ErrInvalidPassword) || service.createCalls != 0 {
-		t.Fatalf("RegisterWithPassword(short) = status %d error %v creates %d", statusCode, err, service.createCalls)
+		t.Fatalf("RegisterWithPassword(empty) = status %d error %v creates %d", statusCode, err, service.createCalls)
+	}
+}
+
+func TestRegisterWithPasswordAcceptsExistingHortaTechPassword(t *testing.T) {
+	controller, service, _ := newPasswordRegistrationController()
+	statusCode, _, err := controller.RegisterWithPassword(context.Background(), dto.UserRegisterWithPassword{
+		Email: "existing-frontend@example.com", Name: "Existing Frontend", Password: "hola", DeviceInfo: authRegressionDevice(),
+	})
+	if err != nil || statusCode != http.StatusCreated || service.createCalls != 1 {
+		t.Fatalf("RegisterWithPassword(hola) = status %d error %v creates %d", statusCode, err, service.createCalls)
 	}
 }
 

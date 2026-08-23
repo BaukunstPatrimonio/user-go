@@ -22,7 +22,10 @@ const (
 	maxArgon2SaltLength = 1024
 	maxArgon2KeyLength  = 1024
 
-	RegistrationMinimumLength = 8
+	// HortaTech's existing registration and reset screens only require a
+	// non-empty password. Keep that compatibility policy scoped to this branch.
+	RegistrationMinimumLength = 1
+	ResetMinimumLength        = 1
 	RegistrationMaximumLength = 128
 )
 
@@ -35,11 +38,21 @@ var (
 // ValidateRegistrationPassword applies the deliberately modest password
 // policy used for new accounts. Lengths are measured in Unicode characters.
 func ValidateRegistrationPassword(password string) error {
+	return validatePasswordLength(password, RegistrationMinimumLength)
+}
+
+// ValidateResetPassword is intentionally separate from registration so either
+// compatibility policy can change without silently broadening the other flow.
+func ValidateResetPassword(password string) error {
+	return validatePasswordLength(password, ResetMinimumLength)
+}
+
+func validatePasswordLength(password string, minimum int) error {
 	if !utf8.ValidString(password) {
 		return ErrInvalidLength
 	}
 	length := utf8.RuneCountInString(password)
-	if length < RegistrationMinimumLength || length > RegistrationMaximumLength {
+	if length < minimum || length > RegistrationMaximumLength {
 		return ErrInvalidLength
 	}
 	return nil

@@ -35,7 +35,7 @@ type UserRegisterWithPassword struct {
 	models.DeviceInfo
 	Email     string `json:"email" validate:"email,required"`
 	Name      string `json:"name" validate:"required"`
-	Password  string `json:"-" validate:"required,min=8,max=128"`
+	Password  string `json:"-" validate:"required,max=128"`
 	PhoneE164 string `json:"phone_e164,omitempty"`
 }
 
@@ -51,7 +51,7 @@ type UserRequestPasswordReset struct {
 
 type UserResetPassword struct {
 	ResetToken  string `json:"-" validate:"required"`
-	NewPassword string `json:"-" validate:"required,min=8,max=128"`
+	NewPassword string `json:"-" validate:"required,max=128"`
 }
 
 type UserUpdate struct {

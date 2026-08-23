@@ -9,3 +9,10 @@ type PasswordRegistration struct {
 	VerificationCode string
 	CodeExpires      time.Time
 }
+
+// EmailChange is the trusted-boundary result required to deliver a fresh
+// verification link after an authenticated identity-email change.
+type EmailChange struct {
+	VerificationCode string
+	CodeExpires      time.Time
+}

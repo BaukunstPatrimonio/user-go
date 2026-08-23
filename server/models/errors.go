@@ -16,6 +16,7 @@ var (
 	ErrInvalidToken              = errors.New("invalid token")
 	ErrSessionDeviceMismatch     = errors.New("session device mismatch")
 	ErrInvalidCredentials        = errors.New("invalid email or password")
+	ErrCurrentPasswordInvalid    = errors.New("current password is invalid")
 	ErrCredentialNotFound        = errors.New("password credential not found")
 	ErrAccountNotValidated       = errors.New("account is not validated")
 	ErrUserAlreadyExists         = errors.New("user already exists")

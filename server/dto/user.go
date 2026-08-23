@@ -45,6 +45,19 @@ type UserSetPhone struct {
 	PhoneE164 string `json:"phone_e164" validate:"required"`
 }
 
+type UserChangePassword struct {
+	models.DeviceInfo
+	Token           string `json:"-" validate:"required"`
+	CurrentPassword string `json:"-" validate:"required,max=128"`
+	NewPassword     string `json:"-" validate:"required,max=128"`
+}
+
+type UserChangeEmail struct {
+	models.DeviceInfo
+	Token string `json:"-" validate:"required"`
+	Email string `json:"email" validate:"email,required"`
+}
+
 type UserRequestPasswordReset struct {
 	Email string `json:"email" validate:"email,required"`
 }

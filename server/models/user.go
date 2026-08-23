@@ -21,10 +21,11 @@ type User struct {
 	//user data
 	gorm.Model
 	DeviceInfo
-	Email      string  `gorm:"uniqueIndex:idx_email;not null" validate:"email,required"`
-	PhoneE164  *string `gorm:"type:varchar(16);uniqueIndex:idx_phone_e164" json:"phone_e164,omitempty"`
-	Name       string  `gorm:"not null" validate:"required"`
-	ProfilePic string  `gorm:"not null"`
+	Email        string  `gorm:"uniqueIndex:idx_email;not null" validate:"email,required"`
+	PendingEmail string  `gorm:"type:varchar(320)"`
+	PhoneE164    *string `gorm:"type:varchar(16);uniqueIndex:idx_phone_e164" json:"phone_e164,omitempty"`
+	Name         string  `gorm:"not null" validate:"required"`
+	ProfilePic   string  `gorm:"not null"`
 	// server data
 	Admin       bool `gorm:"not null;default:false"`
 	SuperAdmin  bool `gorm:"not null;default:false"`

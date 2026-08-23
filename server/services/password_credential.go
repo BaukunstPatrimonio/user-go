@@ -36,6 +36,33 @@ func (s *userService) UpdatePasswordCredentialHash(ctx context.Context, userID u
 	return s.passwordCredentials.UpdateField(ctx, userID, "password_hash", passwordHash)
 }
 
+func (s *userService) ChangePasswordAndRevokeSessions(ctx context.Context, userID uint, passwordHash string) error {
+	if passwordHash == "" {
+		return errors.New("password hash is required")
+	}
+	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		credential := tx.Model(&models.PasswordCredential{}).
+			Where("user_id = ?", userID).
+			Update("password_hash", passwordHash)
+		if credential.Error != nil {
+			return credential.Error
+		}
+		if credential.RowsAffected != 1 {
+			return models.ErrCredentialNotFound
+		}
+		revoked := tx.Model(&models.User{}).
+			Where("id = ?", userID).
+			Updates(map[string]any{"code": "OUT", "code_refresh": "OUT"})
+		if revoked.Error != nil {
+			return revoked.Error
+		}
+		if revoked.RowsAffected != 1 {
+			return models.ErrUserNotFound
+		}
+		return nil
+	})
+}
+
 func (s *userService) StartPasswordSession(
 	ctx context.Context,
 	userID uint,

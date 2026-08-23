@@ -19,6 +19,8 @@ service User {
   rpc RequestPasswordReset (UserRequestPasswordResetRequest) returns (UserRequestPasswordResetResponse) {}
   rpc ResetPassword (UserResetPasswordRequest) returns (UserResetPasswordResponse) {}
   rpc SetPhone (UserSetPhoneRequest) returns (UserResponse) {}
+  rpc ChangePassword (UserChangePasswordRequest) returns (UserStatusResponse) {}
+  rpc ChangeEmail (UserChangeEmailRequest) returns (UserChangeEmailResponse) {}
   rpc LogOut (UserMailRequest) returns (UserStatusResponse) {}
   rpc Validate (UserValidateRequest) returns (UserTokenResponse) {}
   rpc GetByEmail (UserMailRequest) returns (UserResponse) {}
@@ -195,4 +197,23 @@ message UserResetPasswordResponse {
 message UserSetPhoneRequest {
   UserTokenRequest auth = 1;
   string phone_e164 = 2;
+}
+
+message UserChangePasswordRequest {
+  UserTokenRequest auth = 1;
+  string current_password = 2;
+  string new_password = 3;
+}
+
+// verification_code crosses only the trusted internal gRPC boundary for the
+// existing verification email publisher; browser-facing APIs must not echo it.
+message UserChangeEmailRequest {
+  UserTokenRequest auth = 1;
+  string email = 2;
+}
+
+message UserChangeEmailResponse {
+  string verification_code = 1;
+  google.protobuf.Timestamp code_expires = 2;
+  uint32 status = 3;
 }

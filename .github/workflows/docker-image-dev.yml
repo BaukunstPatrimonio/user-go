@@ -2,7 +2,7 @@ name: Deploy API Dev
 
 on:
   push:
-    branches: [ "feature_hortatechAuth" ]
+    branches: [ "dev" ]
 
 permissions:
   contents: read

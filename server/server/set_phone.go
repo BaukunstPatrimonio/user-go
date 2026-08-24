@@ -13,7 +13,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) SetPhone(ctx context.Context, req *pb.UserSetPhoneRequest) (*pb.UserResponse, error) {
+func (s *UserServer) SetPhone(ctx context.Context, req *pb.UserSetPhoneRequest) (response *pb.UserResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "set_phone", err) }()
 	auth := req.GetAuth()
 	if auth.GetToken() == "" || strings.TrimSpace(req.GetPhoneE164()) == "" {
 		return &pb.UserResponse{}, grpcstatus.Error(codes.InvalidArgument, "invalid set phone request")
@@ -46,7 +47,6 @@ func (s *UserServer) SetPhone(ctx context.Context, req *pb.UserSetPhoneRequest) 
 		case errors.Is(err, context.DeadlineExceeded):
 			return &pb.UserResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 		default:
-			s.Log.Error("set phone failed")
 			return &pb.UserResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 		}
 	}

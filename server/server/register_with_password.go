@@ -15,7 +15,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) RegisterWithPassword(ctx context.Context, req *pb.UserRegisterWithPasswordRequest) (*pb.UserRegisterWithPasswordResponse, error) {
+func (s *UserServer) RegisterWithPassword(ctx context.Context, req *pb.UserRegisterWithPasswordRequest) (response *pb.UserRegisterWithPasswordResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "register", err) }()
 	phoneE164 := strings.TrimSpace(req.GetPhoneE164())
 	if phoneE164 != "" {
 		var err error
@@ -60,7 +61,6 @@ func (s *UserServer) RegisterWithPassword(ctx context.Context, req *pb.UserRegis
 		case errors.Is(err, context.DeadlineExceeded):
 			return &pb.UserRegisterWithPasswordResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 		default:
-			s.Log.Error("password registration failed")
 			return &pb.UserRegisterWithPasswordResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 		}
 	}

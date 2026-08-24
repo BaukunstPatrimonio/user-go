@@ -43,7 +43,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.ChainUnaryInterceptor(server.UnaryLoggingInterceptor(l)))
 	healthcheck := health.NewServer()
 	healthgrpc.RegisterHealthServer(s, healthcheck)
 	pb.RegisterUserServer(s, &userServer)

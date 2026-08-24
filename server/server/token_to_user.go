@@ -8,7 +8,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) TokenToUser(ctx context.Context, req *pb.UserTokenRequest) (*pb.UserResponse, error) {
+func (s *UserServer) TokenToUser(ctx context.Context, req *pb.UserTokenRequest) (response *pb.UserResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "authenticate_token", err) }()
 	user, err := s.UserController.TokenToUser(
 		ctx,
 		req.GetToken(),
@@ -22,7 +23,6 @@ func (s *UserServer) TokenToUser(ctx context.Context, req *pb.UserTokenRequest) 
 		req.GetCookiesEnabled(),
 	)
 	if err != nil {
-		s.Log.Error(err.Error())
 		return &pb.UserResponse{}, err
 	}
 

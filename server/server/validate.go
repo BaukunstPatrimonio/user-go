@@ -7,10 +7,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) Validate(ctx context.Context, req *pb.UserValidateRequest) (*pb.UserTokenResponse, error) {
+func (s *UserServer) Validate(ctx context.Context, req *pb.UserValidateRequest) (response *pb.UserTokenResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "validate_account", err) }()
 	status, token, err := s.UserController.Validate(ctx, req.GetCode())
 	if err != nil {
-		s.Log.Error(err.Error())
 		return &pb.UserTokenResponse{}, err
 	}
 

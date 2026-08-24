@@ -15,7 +15,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) LoginWithPassword(ctx context.Context, req *pb.UserLoginWithPasswordRequest) (*pb.UserTokenResponse, error) {
+func (s *UserServer) LoginWithPassword(ctx context.Context, req *pb.UserLoginWithPasswordRequest) (response *pb.UserTokenResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "login", err) }()
 	email := req.GetEmail()
 	phoneE164 := strings.TrimSpace(req.GetPhoneE164())
 	if (email == "") == (phoneE164 == "") {
@@ -61,7 +62,6 @@ func (s *UserServer) LoginWithPassword(ctx context.Context, req *pb.UserLoginWit
 		case errors.Is(err, context.DeadlineExceeded):
 			return &pb.UserTokenResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 		default:
-			s.Log.Error("password login failed")
 			return &pb.UserTokenResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 		}
 	}

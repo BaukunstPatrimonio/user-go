@@ -14,14 +14,14 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) ChangePassword(ctx context.Context, req *pb.UserChangePasswordRequest) (*pb.UserStatusResponse, error) {
+func (s *UserServer) ChangePassword(ctx context.Context, req *pb.UserChangePasswordRequest) (response *pb.UserStatusResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "change_password", err) }()
 	request := dto.UserChangePassword{CurrentPassword: req.GetCurrentPassword(), NewPassword: req.GetNewPassword(), Token: req.GetAuth().GetToken(), DeviceInfo: deviceInfo(req.GetAuth())}
 	if err := validator.New(validator.WithRequiredStructEnabled()).Struct(request); err != nil {
 		return &pb.UserStatusResponse{}, grpcstatus.Error(codes.InvalidArgument, "invalid password change request")
 	}
 	controller, ok := s.UserController.(accountController)
 	if !ok {
-		s.Log.Error("authenticated account controller is unavailable")
 		return &pb.UserStatusResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 	}
 	statusCode, err := controller.ChangePassword(ctx, request)
@@ -36,21 +36,20 @@ func (s *UserServer) ChangePassword(ctx context.Context, req *pb.UserChangePassw
 		case errors.Is(err, context.DeadlineExceeded):
 			return &pb.UserStatusResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 		default:
-			s.Log.Error("authenticated password change failed")
 			return &pb.UserStatusResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 		}
 	}
 	return &pb.UserStatusResponse{Status: uint32(statusCode)}, nil
 }
 
-func (s *UserServer) ChangeEmail(ctx context.Context, req *pb.UserChangeEmailRequest) (*pb.UserChangeEmailResponse, error) {
+func (s *UserServer) ChangeEmail(ctx context.Context, req *pb.UserChangeEmailRequest) (response *pb.UserChangeEmailResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "change_email", err) }()
 	request := dto.UserChangeEmail{Email: strings.ToLower(strings.TrimSpace(req.GetEmail())), Token: req.GetAuth().GetToken(), DeviceInfo: deviceInfo(req.GetAuth())}
 	if err := validator.New(validator.WithRequiredStructEnabled()).Struct(request); err != nil {
 		return &pb.UserChangeEmailResponse{}, grpcstatus.Error(codes.InvalidArgument, "invalid email change request")
 	}
 	controller, ok := s.UserController.(accountController)
 	if !ok {
-		s.Log.Error("authenticated account controller is unavailable")
 		return &pb.UserChangeEmailResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 	}
 	statusCode, result, err := controller.ChangeEmail(ctx, request)
@@ -63,7 +62,6 @@ func (s *UserServer) ChangeEmail(ctx context.Context, req *pb.UserChangeEmailReq
 		case errors.Is(err, context.DeadlineExceeded):
 			return &pb.UserChangeEmailResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 		default:
-			s.Log.Error("authenticated email change failed")
 			return &pb.UserChangeEmailResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 		}
 	}

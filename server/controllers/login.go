@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	entModels "github.com/alvarotor/entitier-go/models"
 	"github.com/BaukunstPatrimonio/user-go/server/dto"
 	"github.com/BaukunstPatrimonio/user-go/server/models"
+	entModels "github.com/alvarotor/entitier-go/models"
 	"golang.org/x/exp/rand"
 )
 
@@ -56,9 +56,6 @@ func (u *controllerUser) Login(c context.Context, userLogin dto.UserLogin) (int,
 			return http.StatusInternalServerError, "", err
 		}
 	}
-
-	u.log.Info("user code: " + user.Code)
-	u.log.Info("user code refresh: " + user.CodeRefresh)
 
 	return http.StatusOK, user.Code, nil
 }

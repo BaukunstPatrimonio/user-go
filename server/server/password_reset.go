@@ -14,7 +14,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) RequestPasswordReset(ctx context.Context, req *pb.UserRequestPasswordResetRequest) (*pb.UserRequestPasswordResetResponse, error) {
+func (s *UserServer) RequestPasswordReset(ctx context.Context, req *pb.UserRequestPasswordResetRequest) (response *pb.UserRequestPasswordResetResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "request_password_reset", err) }()
 	request := dto.UserRequestPasswordReset{Email: strings.ToLower(strings.TrimSpace(req.GetEmail()))}
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	if err := validate.Struct(request); err != nil {
@@ -26,11 +27,10 @@ func (s *UserServer) RequestPasswordReset(ctx context.Context, req *pb.UserReque
 		if errors.Is(err, context.DeadlineExceeded) {
 			return &pb.UserRequestPasswordResetResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 		}
-		s.Log.Error("password reset request failed")
 		return &pb.UserRequestPasswordResetResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 	}
 
-	response := &pb.UserRequestPasswordResetResponse{
+	response = &pb.UserRequestPasswordResetResponse{
 		ResetToken: result.ResetToken,
 		Status:     uint32(statusCode),
 	}
@@ -40,7 +40,8 @@ func (s *UserServer) RequestPasswordReset(ctx context.Context, req *pb.UserReque
 	return response, nil
 }
 
-func (s *UserServer) ResetPassword(ctx context.Context, req *pb.UserResetPasswordRequest) (*pb.UserResetPasswordResponse, error) {
+func (s *UserServer) ResetPassword(ctx context.Context, req *pb.UserResetPasswordRequest) (response *pb.UserResetPasswordResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "reset_password", err) }()
 	reset := dto.UserResetPassword{ResetToken: req.GetResetToken(), NewPassword: req.GetNewPassword()}
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	if err := validate.Struct(reset); err != nil {
@@ -57,7 +58,6 @@ func (s *UserServer) ResetPassword(ctx context.Context, req *pb.UserResetPasswor
 		case errors.Is(err, context.DeadlineExceeded):
 			return &pb.UserResetPasswordResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
 		default:
-			s.Log.Error("password reset failed")
 			return &pb.UserResetPasswordResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
 		}
 	}

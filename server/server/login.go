@@ -9,7 +9,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func (s *UserServer) Login(ctx context.Context, req *pb.UserLoginRequest) (*pb.UserLoginResponse, error) {
+func (s *UserServer) Login(ctx context.Context, req *pb.UserLoginRequest) (response *pb.UserLoginResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "login_passwordless", err) }()
 	userLogin := dto.UserLogin{
 		Email: req.GetEmail(),
 		DeviceInfo: models.DeviceInfo{
@@ -25,15 +26,13 @@ func (s *UserServer) Login(ctx context.Context, req *pb.UserLoginRequest) (*pb.U
 	}
 
 	validator := validator.New(validator.WithRequiredStructEnabled())
-	err := validator.Struct(userLogin)
+	err = validator.Struct(userLogin)
 	if err != nil {
-		s.Log.Error(err.Error())
 		return &pb.UserLoginResponse{}, err
 	}
 
 	status, code, err := s.UserController.Login(ctx, userLogin)
 	if err != nil {
-		s.Log.Error(err.Error())
 		return &pb.UserLoginResponse{}, err
 	}
 

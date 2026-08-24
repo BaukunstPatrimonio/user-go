@@ -11,10 +11,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *UserServer) Refresh(ctx context.Context, req *pb.UserTokenRequest) (*pb.UserTokenResponse, error) {
+func (s *UserServer) Refresh(ctx context.Context, req *pb.UserTokenRequest) (response *pb.UserTokenResponse, err error) {
+	defer func() { s.logApplicationOutcome(ctx, "refresh_session", err) }()
 	status, token, err := s.UserController.Refresh(ctx, req.GetToken(), req)
 	if err != nil {
-		s.Log.Error(err.Error())
 		switch {
 		case errors.Is(err, context.DeadlineExceeded):
 			return &pb.UserTokenResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())

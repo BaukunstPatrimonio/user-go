@@ -3,12 +3,16 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/BaukunstPatrimonio/user-go/server/models"
 	entModels "github.com/alvarotor/entitier-go/models"
+	"github.com/alvarotor/entitier-go/repository"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type passwordCredentialRepositoryStub struct {
@@ -67,7 +71,7 @@ func (r *passwordCredentialRepositoryStub) UpdateField(_ context.Context, userID
 	return nil
 }
 
-func TestPasswordCredentialServiceCreateRetrieveAndReplace(t *testing.T) {
+func TestPasswordCredentialServiceCreateAndRetrieve(t *testing.T) {
 	repository := &passwordCredentialRepositoryStub{credentials: map[uint]models.PasswordCredential{}}
 	service := &userService{passwordCredentials: repository}
 	credential := models.PasswordCredential{UserID: 583, PasswordHash: "$argon2id$fake-initial-hash"}
@@ -84,14 +88,72 @@ func TestPasswordCredentialServiceCreateRetrieveAndReplace(t *testing.T) {
 	if err != nil || *got != credential {
 		t.Fatalf("GetPasswordCredential() = %#v, %v, want %#v, nil", got, err, credential)
 	}
+}
+
+func TestPasswordCredentialServiceGetsAndUpdatesByUserID(t *testing.T) {
+	service := newRefreshServiceTest(t, &refreshDatabaseState{})
+	service.passwordCredentials = repository.NewGenericRepository[models.PasswordCredential, uint](service.db)
+	credential := models.PasswordCredential{UserID: 583, PasswordHash: "$argon2id$fake-initial-hash"}
+	if err := service.db.Callback().Query().Replace("gorm:query", func(tx *gorm.DB) {
+		primaryKey := tx.Statement.Schema.PrioritizedPrimaryField
+		where, ok := tx.Statement.Clauses["WHERE"].Expression.(clause.Where)
+		predicate, predicateOK := clause.IN{}, false
+		if len(where.Exprs) == 1 {
+			predicate, predicateOK = where.Exprs[0].(clause.IN)
+		}
+		if !ok || primaryKey == nil || primaryKey.DBName != "user_id" || !predicateOK || len(predicate.Values) != 1 || predicate.Values[0] != credential.UserID {
+			tx.AddError(fmt.Errorf("password credential lookup = primary key %#v, predicate %#v, want user_id = %d", primaryKey, predicate, credential.UserID))
+			return
+		}
+		stored, ok := tx.Statement.Dest.(*models.PasswordCredential)
+		if !ok {
+			tx.AddError(fmt.Errorf("password credential lookup destination = %T", tx.Statement.Dest))
+			return
+		}
+		*stored = credential
+		tx.RowsAffected = 1
+	}); err != nil {
+		t.Fatalf("replace credential query callback: %v", err)
+	}
+
+	got, err := service.GetPasswordCredential(context.Background(), credential.UserID)
+	if err != nil || got.UserID != credential.UserID || got.PasswordHash != credential.PasswordHash {
+		t.Fatalf("GetPasswordCredential() = %#v, %v, want credential for user ID %d", got, err, credential.UserID)
+	}
 
 	replacement := "$argon2id$fake-replacement-hash"
+	updates := 0
+	if err := service.db.Callback().Update().Replace("gorm:update", func(tx *gorm.DB) {
+		updates++
+		expectedUserID := credential.UserID
+		if updates > 1 {
+			expectedUserID++
+		}
+		where, ok := tx.Statement.Clauses["WHERE"].Expression.(clause.Where)
+		predicate, predicateOK := clause.Expr{}, false
+		if len(where.Exprs) == 1 {
+			predicate, predicateOK = where.Exprs[0].(clause.Expr)
+		}
+		if !ok || !predicateOK || predicate.SQL != "user_id = ?" || len(predicate.Vars) != 1 || predicate.Vars[0] != expectedUserID || !strings.Contains(fmt.Sprintf("%#v", tx.Statement.Dest), "password_hash") {
+			tx.AddError(fmt.Errorf("password credential update predicate/destination = %#v / %#v, want user_id and password_hash", predicate, tx.Statement.Dest))
+			return
+		}
+		if updates == 1 {
+			credential.PasswordHash = replacement
+			tx.RowsAffected = 1
+		}
+	}); err != nil {
+		t.Fatalf("replace credential update callback: %v", err)
+	}
 	if err := service.UpdatePasswordCredentialHash(context.Background(), credential.UserID, replacement); err != nil {
 		t.Fatalf("UpdatePasswordCredentialHash() error = %v", err)
 	}
 	got, err = service.GetPasswordCredential(context.Background(), credential.UserID)
 	if err != nil || got.PasswordHash != replacement {
 		t.Fatalf("updated credential = %#v, %v, want replacement hash", got, err)
+	}
+	if err := service.UpdatePasswordCredentialHash(context.Background(), credential.UserID+1, replacement); !errors.Is(err, models.ErrCredentialNotFound) {
+		t.Fatalf("UpdatePasswordCredentialHash(missing) error = %v, want %v", err, models.ErrCredentialNotFound)
 	}
 }
 

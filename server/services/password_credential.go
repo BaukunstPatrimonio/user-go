@@ -33,7 +33,17 @@ func (s *userService) UpdatePasswordCredentialHash(ctx context.Context, userID u
 	if passwordHash == "" {
 		return errors.New("password hash is required")
 	}
-	return s.passwordCredentials.UpdateField(ctx, userID, "password_hash", passwordHash)
+	result := s.db.WithContext(ctx).
+		Model(&models.PasswordCredential{}).
+		Where("user_id = ?", userID).
+		Update("password_hash", passwordHash)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected != 1 {
+		return models.ErrCredentialNotFound
+	}
+	return nil
 }
 
 func (s *userService) ChangePasswordAndRevokeSessions(ctx context.Context, userID uint, passwordHash string) error {

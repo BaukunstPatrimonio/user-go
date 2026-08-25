@@ -309,6 +309,11 @@ func TestLoginWithPasswordUpgradesValidBcryptCredential(t *testing.T) {
 	if service.credentialUpdates != 1 || !strings.HasPrefix(service.lastReplacementHash, "$argon2id$") || service.credential.PasswordHash != service.lastReplacementHash {
 		t.Fatalf("bcrypt upgrade = calls:%d hash prefix:%q, want one persisted Argon2id hash", service.credentialUpdates, service.lastReplacementHash)
 	}
+
+	statusCode, tokens, err = controller.LoginWithPassword(context.Background(), passwordLoginRequest(authRegressionDevice(), passwordLoginFakePassword))
+	if err != nil || statusCode != http.StatusOK || tokens.Token == "" || service.credentialUpdates != 1 {
+		t.Fatalf("LoginWithPassword(upgraded Argon2id) = status %d tokens %#v updates:%d error %v, want success without another upgrade", statusCode, tokens, service.credentialUpdates, err)
+	}
 }
 
 func TestLoginWithPasswordDoesNotAuthenticateWhenBcryptUpgradePersistenceFails(t *testing.T) {

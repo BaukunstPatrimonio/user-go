@@ -6,7 +6,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strings"
 	"testing"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/BaukunstPatrimonio/user-go/server/services"
 	entModels "github.com/alvarotor/entitier-go/models"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const passwordLoginFakePassword = "phase-two-fake-password!"
@@ -27,15 +25,12 @@ type passwordLoginService struct {
 	credential          *models.PasswordCredential
 	userLookupErr       error
 	credentialLookupErr error
-	credentialUpdateErr error
 	sessionErr          error
-	credentialUpdates   int
 	sessionUpdates      int
 	lastDevice          models.DeviceInfo
 	lastCode            string
 	lastCodeExpire      time.Time
 	lastCodeRefresh     string
-	lastReplacementHash string
 }
 
 func (s *passwordLoginService) UpdatePhoneIdentity(_ context.Context, userID uint, phoneE164 string) error {
@@ -76,19 +71,6 @@ func (s *passwordLoginService) GetPasswordCredential(_ context.Context, userID u
 	return s.credential, nil
 }
 
-func (s *passwordLoginService) UpdatePasswordCredentialHash(_ context.Context, userID uint, passwordHash string) error {
-	s.credentialUpdates++
-	s.lastReplacementHash = passwordHash
-	if s.credentialUpdateErr != nil {
-		return s.credentialUpdateErr
-	}
-	if s.credential == nil || s.credential.UserID != userID {
-		return models.ErrCredentialNotFound
-	}
-	s.credential.PasswordHash = passwordHash
-	return nil
-}
-
 func (s *passwordLoginService) StartPasswordSession(_ context.Context, userID uint, device models.DeviceInfo, code string, codeExpire time.Time, codeRefresh string) error {
 	s.sessionUpdates++
 	s.lastDevice = device
@@ -114,6 +96,7 @@ func TestLoginWithPasswordReturnsExistingTokenFormatAndPersistsFreshSession(t *t
 	service.user.CodeRefresh = "old-refresh-code"
 	device := authRegressionDevice()
 	device.Language = "es-ES"
+	storedHash := service.credential.PasswordHash
 	before := time.Now().UTC()
 
 	statusCode, tokens, err := controller.LoginWithPassword(context.Background(), passwordLoginRequest(device, passwordLoginFakePassword))
@@ -122,6 +105,9 @@ func TestLoginWithPasswordReturnsExistingTokenFormatAndPersistsFreshSession(t *t
 	}
 	if statusCode != http.StatusOK || tokens.Token == "" || tokens.TokenRefresh == "" {
 		t.Fatalf("LoginWithPassword() = status %d tokens %#v, want status 200 and both tokens", statusCode, tokens)
+	}
+	if service.credential.PasswordHash != storedHash {
+		t.Fatal("LoginWithPassword() rewrote the password credential")
 	}
 	if service.sessionUpdates != 1 || service.lastDevice != device {
 		t.Fatalf("session persistence = calls:%d device:%#v, want one update with %#v", service.sessionUpdates, service.lastDevice, device)
@@ -291,46 +277,6 @@ func TestLoginWithPasswordRejectsUnvalidatedAccountAfterCorrectPassword(t *testi
 	}
 	if tokens.Token != "" || tokens.TokenRefresh != "" || service.sessionUpdates != 0 {
 		t.Fatalf("unvalidated login issued/persisted session: tokens %#v updates %d", tokens, service.sessionUpdates)
-	}
-}
-
-func TestLoginWithPasswordUpgradesValidBcryptCredential(t *testing.T) {
-	controller, service, _ := newPasswordLoginController(t)
-	legacyHash, err := bcrypt.GenerateFromPassword([]byte(passwordLoginFakePassword), bcrypt.MinCost)
-	if err != nil {
-		t.Fatalf("GenerateFromPassword() error = %v", err)
-	}
-	service.credential.PasswordHash = string(legacyHash)
-
-	statusCode, tokens, err := controller.LoginWithPassword(context.Background(), passwordLoginRequest(authRegressionDevice(), passwordLoginFakePassword))
-	if err != nil || statusCode != http.StatusOK || tokens.Token == "" {
-		t.Fatalf("LoginWithPassword(bcrypt) = status %d tokens %#v error %v, want success", statusCode, tokens, err)
-	}
-	if service.credentialUpdates != 1 || !strings.HasPrefix(service.lastReplacementHash, "$argon2id$") || service.credential.PasswordHash != service.lastReplacementHash {
-		t.Fatalf("bcrypt upgrade = calls:%d hash prefix:%q, want one persisted Argon2id hash", service.credentialUpdates, service.lastReplacementHash)
-	}
-
-	statusCode, tokens, err = controller.LoginWithPassword(context.Background(), passwordLoginRequest(authRegressionDevice(), passwordLoginFakePassword))
-	if err != nil || statusCode != http.StatusOK || tokens.Token == "" || service.credentialUpdates != 1 {
-		t.Fatalf("LoginWithPassword(upgraded Argon2id) = status %d tokens %#v updates:%d error %v, want success without another upgrade", statusCode, tokens, service.credentialUpdates, err)
-	}
-}
-
-func TestLoginWithPasswordDoesNotAuthenticateWhenBcryptUpgradePersistenceFails(t *testing.T) {
-	controller, service, _ := newPasswordLoginController(t)
-	legacyHash, err := bcrypt.GenerateFromPassword([]byte(passwordLoginFakePassword), bcrypt.MinCost)
-	if err != nil {
-		t.Fatalf("GenerateFromPassword() error = %v", err)
-	}
-	service.credential.PasswordHash = string(legacyHash)
-	service.credentialUpdateErr = errors.New("credential update failed")
-
-	statusCode, tokens, err := controller.LoginWithPassword(context.Background(), passwordLoginRequest(authRegressionDevice(), passwordLoginFakePassword))
-	if statusCode != http.StatusInternalServerError || err == nil {
-		t.Fatalf("LoginWithPassword() = status %d error %v, want internal failure", statusCode, err)
-	}
-	if tokens.Token != "" || tokens.TokenRefresh != "" || service.sessionUpdates != 0 {
-		t.Fatalf("failed bcrypt upgrade issued/persisted session: tokens %#v updates %d", tokens, service.sessionUpdates)
 	}
 }
 

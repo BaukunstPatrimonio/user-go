@@ -84,14 +84,6 @@ func (s *passwordRegistrationService) GetPasswordCredential(_ context.Context, u
 	return s.credential, nil
 }
 
-func (s *passwordRegistrationService) UpdatePasswordCredentialHash(_ context.Context, userID uint, passwordHash string) error {
-	if s.credential == nil || s.credential.UserID != userID {
-		return models.ErrCredentialNotFound
-	}
-	s.credential.PasswordHash = passwordHash
-	return nil
-}
-
 func (s *passwordRegistrationService) StartPasswordSession(_ context.Context, userID uint, device models.DeviceInfo, code string, codeExpire time.Time, codeRefresh string) error {
 	if s.user == nil || s.user.ID != userID {
 		return models.ErrUserNotFound

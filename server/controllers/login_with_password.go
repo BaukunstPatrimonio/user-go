@@ -65,17 +65,6 @@ func (u *controllerUser) LoginWithPassword(ctx context.Context, login dto.UserLo
 		return http.StatusPreconditionFailed, &models.Token{}, models.ErrAccountNotValidated
 	}
 
-	if u.passwords.IsBcryptHash(credential.PasswordHash) {
-		upgradedHash, err := u.passwords.HashPassword(login.Password)
-		if err != nil {
-			return http.StatusInternalServerError, &models.Token{}, fmt.Errorf("upgrade password credential: %w", err)
-		}
-		if err := u.UpdatePasswordCredentialHash(ctx, user.ID, upgradedHash); err != nil {
-			return http.StatusInternalServerError, &models.Token{}, fmt.Errorf("persist upgraded password credential: %w", err)
-		}
-		credential.PasswordHash = upgradedHash
-	}
-
 	code := user.Code
 	codeExpire := user.CodeExpire
 	if code == "OUT" || len(code) != u.conf.SizeRandomStringValidation {

@@ -16,7 +16,6 @@ type IUserService interface {
 	GetByCodeRefresh(context.Context, string) (*models.User, error)
 	GetPasswordCredential(context.Context, uint) (*models.PasswordCredential, error)
 	CreatePasswordCredential(context.Context, models.PasswordCredential) (*models.PasswordCredential, error)
-	UpdatePasswordCredentialHash(context.Context, uint, string) error
 	PasswordRegistrationEmailExists(context.Context, string) (bool, error)
 	CreatePasswordUser(context.Context, models.User, string) (*models.User, error)
 	FindPasswordResetUser(context.Context, string) (*models.User, error)

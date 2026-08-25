@@ -4,8 +4,6 @@ import (
 	"errors"
 	"strings"
 	"testing"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 const fakePassword = "correct horse battery staple!"
@@ -115,6 +113,7 @@ func TestMalformedAndUnsupportedHashesAreRejected(t *testing.T) {
 		{name: "trailing parameter data", hash: "$argon2id$v=19$m=8192,t=1,p=1x$c2FsdA$aGFzaA", err: ErrInvalidHash},
 		{name: "excessive memory", hash: "$argon2id$v=19$m=262145,t=1,p=1$c2FsdA$aGFzaA", err: ErrInvalidHash},
 		{name: "unsupported", hash: "$scrypt$not-supported", err: ErrUnsupportedHash},
+		{name: "legacy format", hash: "$2a$10$7EqJtq98hPqEX7fNZaFWoOq6HnH6T4NfYTo2WBdRyA1lJ8YWFYlqK", err: ErrUnsupportedHash},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -123,26 +122,6 @@ func TestMalformedAndUnsupportedHashesAreRejected(t *testing.T) {
 				t.Fatalf("VerifyPassword() = %v, %v, want false, %v", valid, err, test.err)
 			}
 		})
-	}
-}
-
-func TestBcryptVerification(t *testing.T) {
-	manager := newTestManager()
-	legacyHash, err := bcrypt.GenerateFromPassword([]byte(fakePassword), bcrypt.MinCost)
-	if err != nil {
-		t.Fatalf("GenerateFromPassword() error = %v", err)
-	}
-	if !manager.IsBcryptHash(string(legacyHash)) {
-		t.Fatalf("IsBcryptHash(%q) = false, want true", legacyHash)
-	}
-
-	valid, err := manager.VerifyPassword(fakePassword, string(legacyHash))
-	if err != nil || !valid {
-		t.Fatalf("VerifyPassword(correct bcrypt) = %v, %v, want true, nil", valid, err)
-	}
-	valid, err = manager.VerifyPassword("obviously-wrong-password", string(legacyHash))
-	if err != nil || valid {
-		t.Fatalf("VerifyPassword(wrong bcrypt) = %v, %v, want false, nil", valid, err)
 	}
 }
 

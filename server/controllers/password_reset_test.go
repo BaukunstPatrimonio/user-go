@@ -104,16 +104,6 @@ func (s *passwordResetLifecycleService) GetByCodeRefresh(_ context.Context, code
 	return s.user, nil
 }
 
-func (s *passwordResetLifecycleService) UpdatePasswordCredentialHash(_ context.Context, userID uint, passwordHash string) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if s.credential == nil || s.credential.UserID != userID {
-		return models.ErrCredentialNotFound
-	}
-	s.credential.PasswordHash = passwordHash
-	return nil
-}
-
 func (s *passwordResetLifecycleService) StartPasswordSession(_ context.Context, userID uint, device models.DeviceInfo, code string, codeExpire time.Time, codeRefresh string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -11,12 +11,10 @@ import (
 	"unicode/utf8"
 
 	"golang.org/x/crypto/argon2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const (
 	argon2IDPrefix      = "$argon2id$"
-	bcryptPrefix        = "$2"
 	maxArgon2Memory     = 256 * 1024
 	maxArgon2Iterations = 20
 	maxArgon2SaltLength = 1024
@@ -83,7 +81,6 @@ func DefaultParameters() Parameters {
 type Manager interface {
 	HashPassword(password string) (string, error)
 	VerifyPassword(password, encodedHash string) (bool, error)
-	IsBcryptHash(encodedHash string) bool
 }
 
 type manager struct {
@@ -130,25 +127,10 @@ func (m *manager) HashPassword(password string) (string, error) {
 }
 
 func (m *manager) VerifyPassword(password, encodedHash string) (bool, error) {
-	switch {
-	case strings.HasPrefix(encodedHash, argon2IDPrefix):
+	if strings.HasPrefix(encodedHash, argon2IDPrefix) {
 		return verifyArgon2ID(password, encodedHash)
-	case m.IsBcryptHash(encodedHash):
-		err := bcrypt.CompareHashAndPassword([]byte(encodedHash), []byte(password))
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return false, nil
-		}
-		if err != nil {
-			return false, fmt.Errorf("verify bcrypt password: %w", ErrInvalidHash)
-		}
-		return true, nil
-	default:
-		return false, ErrUnsupportedHash
 	}
-}
-
-func (*manager) IsBcryptHash(encodedHash string) bool {
-	return strings.HasPrefix(encodedHash, bcryptPrefix)
+	return false, ErrUnsupportedHash
 }
 
 func verifyArgon2ID(password, encodedHash string) (bool, error) {

@@ -39,6 +39,14 @@ type UserRegisterWithPassword struct {
 	PhoneE164 string `json:"phone_e164,omitempty"`
 }
 
+// UserInvitation creates an identity without a password credential. The
+// opaque setup token is returned only to a trusted internal caller.
+type UserInvitation struct {
+	Email     string `json:"email" validate:"email,required"`
+	Name      string `json:"name" validate:"required"`
+	PhoneE164 string `json:"phone_e164,omitempty"`
+}
+
 type UserSetPhone struct {
 	models.DeviceInfo
 	Token     string `json:"-" validate:"required"`

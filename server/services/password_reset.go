@@ -61,14 +61,12 @@ func (s *userService) ResetPasswordWithToken(ctx context.Context, tokenDigest, p
 			return err
 		}
 
-		credential := tx.Model(&models.PasswordCredential{}).
-			Where("user_id = ?", resetToken.UserID).
-			Update("password_hash", passwordHash)
-		if credential.Error != nil {
-			return credential.Error
-		}
-		if credential.RowsAffected != 1 {
-			return models.ErrInvalidPasswordResetToken
+		credential := models.PasswordCredential{UserID: resetToken.UserID, PasswordHash: passwordHash}
+		if err := tx.Omit("User").Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "user_id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"password_hash", "updated_at"}),
+		}).Create(&credential).Error; err != nil {
+			return err
 		}
 
 		used := tx.Model(&models.PasswordResetToken{}).
@@ -83,7 +81,7 @@ func (s *userService) ResetPasswordWithToken(ctx context.Context, tokenDigest, p
 
 		revoked := tx.Model(&models.User{}).
 			Where("id = ?", resetToken.UserID).
-			Update("code_refresh", "OUT")
+			Updates(map[string]any{"code_refresh": "OUT", "validated": true})
 		if revoked.Error != nil {
 			return revoked.Error
 		}

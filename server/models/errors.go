@@ -26,4 +26,5 @@ var (
 	ErrInvalidPhone              = errors.New("phone must be a canonical E.164 number")
 	ErrPhoneAlreadyExists        = errors.New("phone identity already exists")
 	ErrInvalidLoginIdentity      = errors.New("provide exactly one password login identity")
+	ErrExistingAccountNotReady   = errors.New("existing account is not validated")
 )

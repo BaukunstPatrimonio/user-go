@@ -16,6 +16,10 @@ service User {
   rpc Login (UserLoginRequest) returns (UserLoginResponse) {}
   rpc LoginWithPassword (UserLoginWithPasswordRequest) returns (UserTokenResponse) {}
   rpc RegisterWithPassword (UserRegisterWithPasswordRequest) returns (UserRegisterWithPasswordResponse) {}
+  // Creates or reuses an identity for an administrator-driven invitation.
+  // An invitation token is returned only when the identity has no password
+  // credential. Project authorization and membership remain caller-owned.
+  rpc InviteWithPasswordSetup (UserRegisterWithPasswordRequest) returns (UserRegisterWithPasswordResponse) {}
   rpc RequestPasswordReset (UserRequestPasswordResetRequest) returns (UserRequestPasswordResetResponse) {}
   rpc ResetPassword (UserResetPasswordRequest) returns (UserResetPasswordResponse) {}
   rpc SetPhone (UserSetPhoneRequest) returns (UserResponse) {}

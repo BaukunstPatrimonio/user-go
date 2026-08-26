@@ -1948,7 +1948,7 @@ const file_server_user_pb_user_proto_rawDesc = "" +
 	"\x17UserChangeEmailResponse\x12+\n" +
 	"\x11verification_code\x18\x01 \x01(\tR\x10verificationCode\x12=\n" +
 	"\fcode_expires\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\vcodeExpires\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\rR\x06status2\xb3\f\n" +
+	"\x06status\x18\x03 \x01(\rR\x06status2\xa5\r\n" +
 	"\x04User\x129\n" +
 	"\x06Create\x12\x14.user_pb.UserRequest\x1a\x17.user_pb.UserIDResponse\"\x00\x126\n" +
 	"\x03Get\x12\x16.user_pb.UserIDRequest\x1a\x15.user_pb.UserResponse\"\x00\x12C\n" +
@@ -1957,7 +1957,8 @@ const file_server_user_pb_user_proto_rawDesc = "" +
 	"\x04List\x12\x16.google.protobuf.Empty\x1a\x1a.user_pb.ListUsersResponse\"\x00\x12@\n" +
 	"\x05Login\x12\x19.user_pb.UserLoginRequest\x1a\x1a.user_pb.UserLoginResponse\"\x00\x12X\n" +
 	"\x11LoginWithPassword\x12%.user_pb.UserLoginWithPasswordRequest\x1a\x1a.user_pb.UserTokenResponse\"\x00\x12m\n" +
-	"\x14RegisterWithPassword\x12(.user_pb.UserRegisterWithPasswordRequest\x1a).user_pb.UserRegisterWithPasswordResponse\"\x00\x12m\n" +
+	"\x14RegisterWithPassword\x12(.user_pb.UserRegisterWithPasswordRequest\x1a).user_pb.UserRegisterWithPasswordResponse\"\x00\x12p\n" +
+	"\x17InviteWithPasswordSetup\x12(.user_pb.UserRegisterWithPasswordRequest\x1a).user_pb.UserRegisterWithPasswordResponse\"\x00\x12m\n" +
 	"\x14RequestPasswordReset\x12(.user_pb.UserRequestPasswordResetRequest\x1a).user_pb.UserRequestPasswordResetResponse\"\x00\x12X\n" +
 	"\rResetPassword\x12!.user_pb.UserResetPasswordRequest\x1a\".user_pb.UserResetPasswordResponse\"\x00\x12A\n" +
 	"\bSetPhone\x12\x1c.user_pb.UserSetPhoneRequest\x1a\x15.user_pb.UserResponse\"\x00\x12S\n" +
@@ -2037,42 +2038,44 @@ var file_server_user_pb_user_proto_depIdxs = []int32{
 	1,  // 16: user_pb.User.Login:input_type -> user_pb.UserLoginRequest
 	15, // 17: user_pb.User.LoginWithPassword:input_type -> user_pb.UserLoginWithPasswordRequest
 	16, // 18: user_pb.User.RegisterWithPassword:input_type -> user_pb.UserRegisterWithPasswordRequest
-	18, // 19: user_pb.User.RequestPasswordReset:input_type -> user_pb.UserRequestPasswordResetRequest
-	20, // 20: user_pb.User.ResetPassword:input_type -> user_pb.UserResetPasswordRequest
-	22, // 21: user_pb.User.SetPhone:input_type -> user_pb.UserSetPhoneRequest
-	23, // 22: user_pb.User.ChangePassword:input_type -> user_pb.UserChangePasswordRequest
-	24, // 23: user_pb.User.ChangeEmail:input_type -> user_pb.UserChangeEmailRequest
-	2,  // 24: user_pb.User.LogOut:input_type -> user_pb.UserMailRequest
-	11, // 25: user_pb.User.Validate:input_type -> user_pb.UserValidateRequest
-	4,  // 26: user_pb.User.VerifyUser:input_type -> user_pb.UserIDRequest
-	2,  // 27: user_pb.User.GetByEmail:input_type -> user_pb.UserMailRequest
-	3,  // 28: user_pb.User.TokenToUser:input_type -> user_pb.UserTokenRequest
-	4,  // 29: user_pb.User.Health:input_type -> user_pb.UserIDRequest
-	14, // 30: user_pb.User.UpdateUserAdminStatus:input_type -> user_pb.UpdateUserAdminRequest
-	3,  // 31: user_pb.User.Refresh:input_type -> user_pb.UserTokenRequest
-	7,  // 32: user_pb.User.Create:output_type -> user_pb.UserIDResponse
-	10, // 33: user_pb.User.Get:output_type -> user_pb.UserResponse
-	8,  // 34: user_pb.User.Update:output_type -> user_pb.UserStatusResponse
-	8,  // 35: user_pb.User.Delete:output_type -> user_pb.UserStatusResponse
-	9,  // 36: user_pb.User.List:output_type -> user_pb.ListUsersResponse
-	12, // 37: user_pb.User.Login:output_type -> user_pb.UserLoginResponse
-	13, // 38: user_pb.User.LoginWithPassword:output_type -> user_pb.UserTokenResponse
-	17, // 39: user_pb.User.RegisterWithPassword:output_type -> user_pb.UserRegisterWithPasswordResponse
-	19, // 40: user_pb.User.RequestPasswordReset:output_type -> user_pb.UserRequestPasswordResetResponse
-	21, // 41: user_pb.User.ResetPassword:output_type -> user_pb.UserResetPasswordResponse
-	10, // 42: user_pb.User.SetPhone:output_type -> user_pb.UserResponse
-	8,  // 43: user_pb.User.ChangePassword:output_type -> user_pb.UserStatusResponse
-	25, // 44: user_pb.User.ChangeEmail:output_type -> user_pb.UserChangeEmailResponse
-	8,  // 45: user_pb.User.LogOut:output_type -> user_pb.UserStatusResponse
-	13, // 46: user_pb.User.Validate:output_type -> user_pb.UserTokenResponse
-	8,  // 47: user_pb.User.VerifyUser:output_type -> user_pb.UserStatusResponse
-	10, // 48: user_pb.User.GetByEmail:output_type -> user_pb.UserResponse
-	10, // 49: user_pb.User.TokenToUser:output_type -> user_pb.UserResponse
-	8,  // 50: user_pb.User.Health:output_type -> user_pb.UserStatusResponse
-	8,  // 51: user_pb.User.UpdateUserAdminStatus:output_type -> user_pb.UserStatusResponse
-	13, // 52: user_pb.User.Refresh:output_type -> user_pb.UserTokenResponse
-	32, // [32:53] is the sub-list for method output_type
-	11, // [11:32] is the sub-list for method input_type
+	16, // 19: user_pb.User.InviteWithPasswordSetup:input_type -> user_pb.UserRegisterWithPasswordRequest
+	18, // 20: user_pb.User.RequestPasswordReset:input_type -> user_pb.UserRequestPasswordResetRequest
+	20, // 21: user_pb.User.ResetPassword:input_type -> user_pb.UserResetPasswordRequest
+	22, // 22: user_pb.User.SetPhone:input_type -> user_pb.UserSetPhoneRequest
+	23, // 23: user_pb.User.ChangePassword:input_type -> user_pb.UserChangePasswordRequest
+	24, // 24: user_pb.User.ChangeEmail:input_type -> user_pb.UserChangeEmailRequest
+	2,  // 25: user_pb.User.LogOut:input_type -> user_pb.UserMailRequest
+	11, // 26: user_pb.User.Validate:input_type -> user_pb.UserValidateRequest
+	4,  // 27: user_pb.User.VerifyUser:input_type -> user_pb.UserIDRequest
+	2,  // 28: user_pb.User.GetByEmail:input_type -> user_pb.UserMailRequest
+	3,  // 29: user_pb.User.TokenToUser:input_type -> user_pb.UserTokenRequest
+	4,  // 30: user_pb.User.Health:input_type -> user_pb.UserIDRequest
+	14, // 31: user_pb.User.UpdateUserAdminStatus:input_type -> user_pb.UpdateUserAdminRequest
+	3,  // 32: user_pb.User.Refresh:input_type -> user_pb.UserTokenRequest
+	7,  // 33: user_pb.User.Create:output_type -> user_pb.UserIDResponse
+	10, // 34: user_pb.User.Get:output_type -> user_pb.UserResponse
+	8,  // 35: user_pb.User.Update:output_type -> user_pb.UserStatusResponse
+	8,  // 36: user_pb.User.Delete:output_type -> user_pb.UserStatusResponse
+	9,  // 37: user_pb.User.List:output_type -> user_pb.ListUsersResponse
+	12, // 38: user_pb.User.Login:output_type -> user_pb.UserLoginResponse
+	13, // 39: user_pb.User.LoginWithPassword:output_type -> user_pb.UserTokenResponse
+	17, // 40: user_pb.User.RegisterWithPassword:output_type -> user_pb.UserRegisterWithPasswordResponse
+	17, // 41: user_pb.User.InviteWithPasswordSetup:output_type -> user_pb.UserRegisterWithPasswordResponse
+	19, // 42: user_pb.User.RequestPasswordReset:output_type -> user_pb.UserRequestPasswordResetResponse
+	21, // 43: user_pb.User.ResetPassword:output_type -> user_pb.UserResetPasswordResponse
+	10, // 44: user_pb.User.SetPhone:output_type -> user_pb.UserResponse
+	8,  // 45: user_pb.User.ChangePassword:output_type -> user_pb.UserStatusResponse
+	25, // 46: user_pb.User.ChangeEmail:output_type -> user_pb.UserChangeEmailResponse
+	8,  // 47: user_pb.User.LogOut:output_type -> user_pb.UserStatusResponse
+	13, // 48: user_pb.User.Validate:output_type -> user_pb.UserTokenResponse
+	8,  // 49: user_pb.User.VerifyUser:output_type -> user_pb.UserStatusResponse
+	10, // 50: user_pb.User.GetByEmail:output_type -> user_pb.UserResponse
+	10, // 51: user_pb.User.TokenToUser:output_type -> user_pb.UserResponse
+	8,  // 52: user_pb.User.Health:output_type -> user_pb.UserStatusResponse
+	8,  // 53: user_pb.User.UpdateUserAdminStatus:output_type -> user_pb.UserStatusResponse
+	13, // 54: user_pb.User.Refresh:output_type -> user_pb.UserTokenResponse
+	33, // [33:55] is the sub-list for method output_type
+	11, // [11:33] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name
 	11, // [11:11] is the sub-list for extension extendee
 	0,  // [0:11] is the sub-list for field type_name

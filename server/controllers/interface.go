@@ -14,6 +14,7 @@ type IControllerUser interface {
 	Login(context.Context, dto.UserLogin) (int, string, error)
 	LoginWithPassword(context.Context, dto.UserLoginWithPassword) (int, *models.Token, error)
 	RegisterWithPassword(context.Context, dto.UserRegisterWithPassword) (int, *models.PasswordRegistration, error)
+	InviteWithPasswordSetup(context.Context, dto.UserInvitation) (int, *models.PasswordInvitation, error)
 	RequestPasswordReset(context.Context, dto.UserRequestPasswordReset) (int, *models.PasswordResetRequest, error)
 	ResetPassword(context.Context, dto.UserResetPassword) (int, error)
 	SetPhone(context.Context, dto.UserSetPhone) (int, *models.User, error)

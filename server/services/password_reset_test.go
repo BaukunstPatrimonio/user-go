@@ -102,8 +102,8 @@ func TestResetPasswordWithTokenCommitsHashUseAndRevocationTogether(t *testing.T)
 	if state.beginCount != 1 || state.commitCount != 1 || state.rollbackCount != 0 || !behavior.lockingSeen {
 		t.Fatalf("transaction = counts:%d/%d/%d locking:%v", state.beginCount, state.commitCount, state.rollbackCount, behavior.lockingSeen)
 	}
-	if fmt.Sprint(behavior.updateOrder) != "[credential token user]" {
-		t.Fatalf("update order = %v, want credential/token/user", behavior.updateOrder)
+	if fmt.Sprint(behavior.updateOrder) != "[token user]" {
+		t.Fatalf("update order = %v, want token/user after credential upsert", behavior.updateOrder)
 	}
 	if state.credential.PasswordHash != "$argon2id$new-hash" || state.resetToken.UsedAt == nil || !state.resetToken.UsedAt.Equal(now) || state.user.CodeRefresh != "OUT" {
 		t.Fatalf("committed reset state = credential:%#v token:%#v user:%#v", state.credential, state.resetToken, state.user)
@@ -131,7 +131,7 @@ func TestResetPasswordWithTokenRejectsExpiredTokenWithoutChanges(t *testing.T) {
 	}
 }
 
-func TestResetPasswordWithTokenCannotCreateCredentialForPasswordlessUser(t *testing.T) {
+func TestResetPasswordWithTokenCreatesCredentialForInvitedPasswordlessUser(t *testing.T) {
 	now := time.Now().UTC()
 	state := passwordResetDatabaseState(now)
 	state.credential = nil
@@ -139,11 +139,11 @@ func TestResetPasswordWithTokenCannotCreateCredentialForPasswordlessUser(t *test
 	oldRefresh := state.user.CodeRefresh
 
 	err := service.ResetPasswordWithToken(context.Background(), state.resetToken.TokenDigest, "$argon2id$new-hash", now)
-	if !errors.Is(err, models.ErrInvalidPasswordResetToken) || state.commitCount != 0 || state.rollbackCount != 1 {
-		t.Fatalf("passwordless reset = %v counts:%d/%d", err, state.commitCount, state.rollbackCount)
+	if err != nil || state.commitCount != 1 || state.rollbackCount != 0 {
+		t.Fatalf("passwordless setup = %v counts:%d/%d", err, state.commitCount, state.rollbackCount)
 	}
-	if state.credential != nil || state.user.CodeRefresh != oldRefresh || state.resetToken.UsedAt != nil {
-		t.Fatal("passwordless reset created credential or changed reset/session state")
+	if state.credential == nil || state.credential.PasswordHash != "$argon2id$new-hash" || state.user.CodeRefresh == oldRefresh || !state.user.Validated || state.resetToken.UsedAt == nil {
+		t.Fatal("passwordless setup did not atomically create credential, validate identity, and consume token")
 	}
 }
 
@@ -223,6 +223,7 @@ func newPasswordResetServiceTest(t *testing.T, state *registrationDatabaseState)
 		case *models.User:
 			behavior.updateOrder = append(behavior.updateOrder, "user")
 			state.pendingUser.CodeRefresh = values["code_refresh"].(string)
+			state.pendingUser.Validated = values["validated"].(bool)
 		default:
 			tx.AddError(fmt.Errorf("unexpected update model %T", tx.Statement.Model))
 			return

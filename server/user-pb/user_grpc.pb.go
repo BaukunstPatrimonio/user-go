@@ -20,27 +20,28 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_Create_FullMethodName                = "/user_pb.User/Create"
-	User_Get_FullMethodName                   = "/user_pb.User/Get"
-	User_Update_FullMethodName                = "/user_pb.User/Update"
-	User_Delete_FullMethodName                = "/user_pb.User/Delete"
-	User_List_FullMethodName                  = "/user_pb.User/List"
-	User_Login_FullMethodName                 = "/user_pb.User/Login"
-	User_LoginWithPassword_FullMethodName     = "/user_pb.User/LoginWithPassword"
-	User_RegisterWithPassword_FullMethodName  = "/user_pb.User/RegisterWithPassword"
-	User_RequestPasswordReset_FullMethodName  = "/user_pb.User/RequestPasswordReset"
-	User_ResetPassword_FullMethodName         = "/user_pb.User/ResetPassword"
-	User_SetPhone_FullMethodName              = "/user_pb.User/SetPhone"
-	User_ChangePassword_FullMethodName        = "/user_pb.User/ChangePassword"
-	User_ChangeEmail_FullMethodName           = "/user_pb.User/ChangeEmail"
-	User_LogOut_FullMethodName                = "/user_pb.User/LogOut"
-	User_Validate_FullMethodName              = "/user_pb.User/Validate"
-	User_VerifyUser_FullMethodName            = "/user_pb.User/VerifyUser"
-	User_GetByEmail_FullMethodName            = "/user_pb.User/GetByEmail"
-	User_TokenToUser_FullMethodName           = "/user_pb.User/TokenToUser"
-	User_Health_FullMethodName                = "/user_pb.User/Health"
-	User_UpdateUserAdminStatus_FullMethodName = "/user_pb.User/UpdateUserAdminStatus"
-	User_Refresh_FullMethodName               = "/user_pb.User/Refresh"
+	User_Create_FullMethodName                  = "/user_pb.User/Create"
+	User_Get_FullMethodName                     = "/user_pb.User/Get"
+	User_Update_FullMethodName                  = "/user_pb.User/Update"
+	User_Delete_FullMethodName                  = "/user_pb.User/Delete"
+	User_List_FullMethodName                    = "/user_pb.User/List"
+	User_Login_FullMethodName                   = "/user_pb.User/Login"
+	User_LoginWithPassword_FullMethodName       = "/user_pb.User/LoginWithPassword"
+	User_RegisterWithPassword_FullMethodName    = "/user_pb.User/RegisterWithPassword"
+	User_InviteWithPasswordSetup_FullMethodName = "/user_pb.User/InviteWithPasswordSetup"
+	User_RequestPasswordReset_FullMethodName    = "/user_pb.User/RequestPasswordReset"
+	User_ResetPassword_FullMethodName           = "/user_pb.User/ResetPassword"
+	User_SetPhone_FullMethodName                = "/user_pb.User/SetPhone"
+	User_ChangePassword_FullMethodName          = "/user_pb.User/ChangePassword"
+	User_ChangeEmail_FullMethodName             = "/user_pb.User/ChangeEmail"
+	User_LogOut_FullMethodName                  = "/user_pb.User/LogOut"
+	User_Validate_FullMethodName                = "/user_pb.User/Validate"
+	User_VerifyUser_FullMethodName              = "/user_pb.User/VerifyUser"
+	User_GetByEmail_FullMethodName              = "/user_pb.User/GetByEmail"
+	User_TokenToUser_FullMethodName             = "/user_pb.User/TokenToUser"
+	User_Health_FullMethodName                  = "/user_pb.User/Health"
+	User_UpdateUserAdminStatus_FullMethodName   = "/user_pb.User/UpdateUserAdminStatus"
+	User_Refresh_FullMethodName                 = "/user_pb.User/Refresh"
 )
 
 // UserClient is the client API for User service.
@@ -55,6 +56,10 @@ type UserClient interface {
 	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
 	LoginWithPassword(ctx context.Context, in *UserLoginWithPasswordRequest, opts ...grpc.CallOption) (*UserTokenResponse, error)
 	RegisterWithPassword(ctx context.Context, in *UserRegisterWithPasswordRequest, opts ...grpc.CallOption) (*UserRegisterWithPasswordResponse, error)
+	// Creates or reuses an identity for an administrator-driven invitation.
+	// An invitation token is returned only when the identity has no password
+	// credential. Project authorization and membership remain caller-owned.
+	InviteWithPasswordSetup(ctx context.Context, in *UserRegisterWithPasswordRequest, opts ...grpc.CallOption) (*UserRegisterWithPasswordResponse, error)
 	RequestPasswordReset(ctx context.Context, in *UserRequestPasswordResetRequest, opts ...grpc.CallOption) (*UserRequestPasswordResetResponse, error)
 	ResetPassword(ctx context.Context, in *UserResetPasswordRequest, opts ...grpc.CallOption) (*UserResetPasswordResponse, error)
 	SetPhone(ctx context.Context, in *UserSetPhoneRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -154,6 +159,16 @@ func (c *userClient) RegisterWithPassword(ctx context.Context, in *UserRegisterW
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserRegisterWithPasswordResponse)
 	err := c.cc.Invoke(ctx, User_RegisterWithPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) InviteWithPasswordSetup(ctx context.Context, in *UserRegisterWithPasswordRequest, opts ...grpc.CallOption) (*UserRegisterWithPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserRegisterWithPasswordResponse)
+	err := c.cc.Invoke(ctx, User_InviteWithPasswordSetup_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -302,6 +317,10 @@ type UserServer interface {
 	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
 	LoginWithPassword(context.Context, *UserLoginWithPasswordRequest) (*UserTokenResponse, error)
 	RegisterWithPassword(context.Context, *UserRegisterWithPasswordRequest) (*UserRegisterWithPasswordResponse, error)
+	// Creates or reuses an identity for an administrator-driven invitation.
+	// An invitation token is returned only when the identity has no password
+	// credential. Project authorization and membership remain caller-owned.
+	InviteWithPasswordSetup(context.Context, *UserRegisterWithPasswordRequest) (*UserRegisterWithPasswordResponse, error)
 	RequestPasswordReset(context.Context, *UserRequestPasswordResetRequest) (*UserRequestPasswordResetResponse, error)
 	ResetPassword(context.Context, *UserResetPasswordRequest) (*UserResetPasswordResponse, error)
 	SetPhone(context.Context, *UserSetPhoneRequest) (*UserResponse, error)
@@ -350,6 +369,9 @@ func (UnimplementedUserServer) LoginWithPassword(context.Context, *UserLoginWith
 }
 func (UnimplementedUserServer) RegisterWithPassword(context.Context, *UserRegisterWithPasswordRequest) (*UserRegisterWithPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterWithPassword not implemented")
+}
+func (UnimplementedUserServer) InviteWithPasswordSetup(context.Context, *UserRegisterWithPasswordRequest) (*UserRegisterWithPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InviteWithPasswordSetup not implemented")
 }
 func (UnimplementedUserServer) RequestPasswordReset(context.Context, *UserRequestPasswordResetRequest) (*UserRequestPasswordResetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestPasswordReset not implemented")
@@ -551,6 +573,24 @@ func _User_RegisterWithPassword_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).RegisterWithPassword(ctx, req.(*UserRegisterWithPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_InviteWithPasswordSetup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRegisterWithPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).InviteWithPasswordSetup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_InviteWithPasswordSetup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).InviteWithPasswordSetup(ctx, req.(*UserRegisterWithPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -827,6 +867,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterWithPassword",
 			Handler:    _User_RegisterWithPassword_Handler,
+		},
+		{
+			MethodName: "InviteWithPasswordSetup",
+			Handler:    _User_InviteWithPasswordSetup_Handler,
 		},
 		{
 			MethodName: "RequestPasswordReset",

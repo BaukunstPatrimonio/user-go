@@ -2,9 +2,13 @@ package server
 
 import (
 	"context"
+	"errors"
 
+	"github.com/BaukunstPatrimonio/user-go/server/models"
 	pb "github.com/BaukunstPatrimonio/user-go/server/user-pb"
 
+	"google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -23,7 +27,21 @@ func (s *UserServer) TokenToUser(ctx context.Context, req *pb.UserTokenRequest) 
 		req.GetCookiesEnabled(),
 	)
 	if err != nil {
-		return &pb.UserResponse{}, err
+		switch {
+		case errors.Is(err, models.ErrInvalidSignature),
+			errors.Is(err, models.ErrTokenExpired),
+			errors.Is(err, models.ErrParsingToken),
+			errors.Is(err, models.ErrInvalidToken),
+			errors.Is(err, models.ErrUserNotLogged),
+			errors.Is(err, models.ErrInvalidUser),
+			errors.Is(err, models.ErrSecurityMismatch),
+			errors.Is(err, models.ErrUserNotFound):
+			return &pb.UserResponse{}, grpcstatus.Error(codes.Unauthenticated, "invalid authentication")
+		case errors.Is(err, context.DeadlineExceeded):
+			return &pb.UserResponse{}, grpcstatus.Error(codes.DeadlineExceeded, context.DeadlineExceeded.Error())
+		default:
+			return &pb.UserResponse{}, grpcstatus.Error(codes.Internal, "internal server error")
+		}
 	}
 
 	return &pb.UserResponse{
